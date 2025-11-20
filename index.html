@@ -22,12 +22,13 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            padding: 10px;
         }
         
         .container {
-            width: 90%;
-            max-width: 800px;
-            height: 85vh;
+            width: 95%;
+            max-width: 900px;
+            height: 90vh;
             position: relative;
         }
         
@@ -45,12 +46,12 @@
             background: white;
             border-radius: 15px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            padding: 25px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             opacity: 0;
             transition: opacity 0.5s ease, transform 0.5s ease;
-            overflow-y: auto;
+            overflow: hidden;
             transform: translateY(20px);
         }
         
@@ -63,10 +64,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             padding-bottom: 15px;
             border-bottom: 2px solid #f0f0f0;
             position: relative;
+            flex-shrink: 0;
         }
         
         .card-title {
@@ -105,15 +107,18 @@
             background: #2d3748;
             color: #e2e8f0;
             border-radius: 8px;
-            padding: 20px;
-            margin: 15px 0;
+            padding: 15px;
+            margin: 10px 0;
             font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-            font-size: 0.95rem;
-            line-height: 1.5;
+            font-size: 0.9rem;
+            line-height: 1.4;
             overflow-x: auto;
+            overflow-y: auto;
             position: relative;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             white-space: pre-wrap;
+            flex: 1;
+            min-height: 0;
         }
         
         .highlight {
@@ -133,41 +138,26 @@
         .mnemonic-section {
             background: #fff9e6;
             border-radius: 8px;
-            padding: 15px;
-            margin: 15px 0;
+            padding: 12px;
+            margin: 10px 0;
             position: relative;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
             border-left: 4px solid #f1c40f;
+            flex-shrink: 0;
         }
         
         .mnemonic-title {
             font-weight: bold;
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
             color: #d35400;
-        }
-        
-        .key-points-section {
-            background: #e8f4fd;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 15px 0;
-            position: relative;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-            border-left: 4px solid #3498db;
-        }
-        
-        .key-points-title {
-            font-weight: bold;
-            display: block;
-            margin-bottom: 8px;
-            color: #2980b9;
         }
         
         .nav-buttons {
             display: flex;
             justify-content: space-between;
-            margin-top: 20px;
+            margin-top: 15px;
+            flex-shrink: 0;
         }
         
         button {
@@ -201,6 +191,7 @@
             border-radius: 3px;
             margin-top: 15px;
             overflow: hidden;
+            flex-shrink: 0;
         }
         
         .progress {
@@ -214,8 +205,9 @@
         .swipe-hint {
             color: #7f8c8d;
             text-align: center;
-            margin-top: 15px;
+            margin-top: 10px;
             font-size: 0.9rem;
+            flex-shrink: 0;
         }
         
         .sidebar-toggle {
@@ -337,12 +329,12 @@
         
         @media (max-width: 768px) {
             .container {
-                width: 95%;
-                height: 80vh;
+                width: 98%;
+                height: 85vh;
             }
             
             .card {
-                padding: 20px;
+                padding: 15px;
             }
             
             .card-title {
@@ -350,13 +342,18 @@
             }
             
             .code-section {
-                font-size: 0.85rem;
-                padding: 15px;
+                font-size: 0.8rem;
+                padding: 12px;
             }
             
             .sidebar {
                 width: 85%;
                 left: -85%;
+            }
+            
+            button {
+                padding: 10px 20px;
+                font-size: 0.9rem;
             }
         }
     </style>
@@ -400,7 +397,7 @@
     </div>
 
     <script>
-        // 题目数据 - 按重要程度排序，1、2、3题降低重要性并排到最后
+        // 题目数据 - 按重要程度排序
         const questions = [
             {
                 title: "函数与循环结合",
@@ -418,7 +415,6 @@ while dayUp(df) < pow(1.01, 365):
     df += 0.001
 print("每天需要为: {:.3f}".format(df))`,
                 mnemonic: "函数封装循环体，参数控制增长率",
-                keyPoints: "函数定义、循环嵌套、条件判断",
                 importance: "⭐⭐⭐⭐⭐"
             },
             {
@@ -432,7 +428,6 @@ for i in range(1, 366):
         dayup = dayup * (1 + dayfactor)
 print("整天打鱼两天晒网的结果: {:.2f}".format(dayup))`,
                 mnemonic: "模5判断打鱼晒网",
-                keyPoints: "模运算、条件分支、周期计算",
                 importance: "⭐⭐⭐⭐"
             },
             {
@@ -443,12 +438,15 @@ print("整天打鱼两天晒网的结果: {:.2f}".format(dayup))`,
 else:
     print(f'{num}不是回文数')`,
                 mnemonic: "字符串反转，相等是回文",
-                keyPoints: "字符串切片、回文判断",
                 importance: "⭐⭐⭐⭐"
             },
             {
                 title: "三数比较大小",
-                code: `<span class="highlight">if num1 > num2:
+                code: `num1 = eval(input("第一个数："))
+num2 = eval(input("第二个数："))
+num3 = eval(input("第三个数："))
+
+<span class="highlight">if num1 > num2:
     if num1 > num3:
         max_num = num1
     else:
@@ -461,7 +459,6 @@ else:
 
 print("最大值为：", max_num)`,
                 mnemonic: "嵌套if比大小，先比前两（后两），再比三",
-                keyPoints: "嵌套if语句、多条件判断",
                 importance: "⭐⭐⭐⭐"
             },
             {
@@ -484,12 +481,16 @@ else:
 
 print("BMI指标：国际'{0}'，国内'{1}'".format(who, dom))`,
                 mnemonic: "体重除身高平方，多条件分类BMI",
-                keyPoints: "数学计算、多分支if-elif",
                 importance: "⭐⭐⭐⭐"
             },
             {
                 title: "字符分类统计",
                 code: `s = input("输入字符串：")
+English = 0
+digit = 0
+space = 0
+other = 0
+
 for c in s:
     <span class="highlight">if 'A' <= c <= 'Z' or 'a' <= c <= 'z':</span>
         English += 1
@@ -502,7 +503,6 @@ for c in s:
 
 print("英文字母：{}，数字：{}，空格：{}，其他：{}".format(English, digit, space, other))`,
                 mnemonic: "字符遍历分类计，字母数字空格其他",
-                keyPoints: "字符判断、计数器使用",
                 importance: "⭐⭐⭐⭐"
             },
             {
@@ -513,12 +513,13 @@ print("英文字母：{}，数字：{}，空格：{}，其他：{}".format(Engli
 else:
     print(f"{year}年不是闰年")`,
                 mnemonic: "四年一闰，百年不闰，四百年再闰",
-                keyPoints: "逻辑运算符、闰年算法",
                 importance: "⭐⭐⭐⭐"
             },
             {
                 title: "温度转换程序",
                 code: `temp = eval(input("请输入温度数值："))
+unit = input("请输入温度符号（C/F）：")
+
 <span class="highlight">if unit in ["F", "f"]:
     C = (temp - 32) / 1.8
     print("转换后的温度值是：{:.2f}°C".format(C))
@@ -528,7 +529,6 @@ elif unit in ["C", "c"]:
 else:
     print("输入格式错误！")`,
                 mnemonic: "摄氏减32除1.8，华氏乘1.8加32",
-                keyPoints: "条件判断、数学公式",
                 importance: "⭐⭐⭐⭐"
             },
             {
@@ -538,7 +538,6 @@ else:
         <span class="highlight">print("{}*{}={:2} ".format(j, i, j * i), end="")</span>
     print()`,
                 mnemonic: "双重循环打印表，内循环到i+1，format对齐输出",
-                keyPoints: "双重循环、字符串格式化",
                 importance: "⭐⭐⭐⭐"
             },
             {
@@ -550,12 +549,13 @@ else:
     if num == b**3 + s**3 + g**3:
         print(num)`,
                 mnemonic: "百位整除100，十位整除10再模10，个位直接模10",
-                keyPoints: "数字分解、水仙花数判断",
                 importance: "⭐⭐⭐⭐"
             },
             {
                 title: "进度条显示",
                 code: `import time
+scale = 10
+
 for i in range(scale + 1):
     <span class="highlight">a = '**' * i</span>
     <span class="highlight">b = '..' * (scale - i)</span>
@@ -563,7 +563,6 @@ for i in range(scale + 1):
     print('[{:>3.0f}%] [{}->{}]'.format(c, a, b))
     time.sleep(0.1)`,
                 mnemonic: "星号点号拼进度，百分比算完成度",
-                keyPoints: "字符串重复、百分比计算",
                 importance: "⭐⭐⭐"
             },
             {
@@ -573,7 +572,6 @@ for i in range(101):
     <span class="highlight">print('\\r{:>3}%'.format(i), end='')</span>  # '\\r' 回车
     time.sleep(0.05)`,
                 mnemonic: "回车符\\r单行刷，end=''不换行",
-                keyPoints: "转义字符\\r、print不换行",
                 importance: "⭐⭐⭐"
             },
             {
@@ -584,7 +582,6 @@ for year in range(1, 11):
     <span class="highlight">moon_weight = weight * 0.165</span>
     print('第{}年：地球: {:.2f}kg 月球: {:.2f}kg'.format(year, weight, moon_weight))`,
                 mnemonic: "体重乘0.165，地球月球比重量",
-                keyPoints: "循环计算、变量更新、格式化输出",
                 importance: "⭐⭐⭐"
             },
             {
@@ -599,7 +596,6 @@ elif money[-1] in ["Y", "y"]:
 else:
     print("输入格式错误！")`,
                 mnemonic: "取数值：字符串切片，判类型：末尾字符",
-                keyPoints: "字符串切片、类型判断",
                 importance: "⭐⭐⭐"
             },
             {
@@ -615,7 +611,6 @@ print("50元纸币的张数：", m50)
 print("5元纸币的张数：", m5)
 print("1元纸币的张数：", m1)`,
                 mnemonic: "整除得张数，取余得余钱",
-                keyPoints: "整除//、取余%运算",
                 importance: "⭐⭐⭐"
             },
             {
@@ -626,7 +621,6 @@ for i in range(1, n + 1):
     <span class="highlight">total += i</span>
 print("1到N之和：", total)`,
                 mnemonic: "range从1到n+1（左闭右开），累加器求和",
-                keyPoints: "range函数、累加求和",
                 importance: "⭐⭐⭐"
             },
             {
@@ -650,7 +644,6 @@ circle(10, 180)
 fd(40 * 2 / 3)
 done()`,
                 mnemonic: "颜色循环画四边",
-                keyPoints: "turtle颜色控制、循环绘图",
                 importance: "⭐⭐"
             },
             {
@@ -666,7 +659,6 @@ for angle in angles:
 
 done()`,
                 mnemonic: "120度转三角",
-                keyPoints: "角度设置、循环绘制几何图形",
                 importance: "⭐⭐"
             },
             {
@@ -675,7 +667,6 @@ done()`,
 <span class="highlight">daydown = pow(0.99, 365)</span>  # 每天退步1%
 print("向上: {:.2f}, 向下: {:.2f}".format(dayup, daydown))`,
                 mnemonic: "幂运算算复利，进步退步看指数",
-                keyPoints: "pow()函数、复利计算",
                 importance: "⭐⭐"
             },
             {
@@ -684,7 +675,6 @@ print("向上: {:.2f}, 向下: {:.2f}".format(dayup, daydown))`,
 str2 = input("请输入第二个名字：")
 print("世界达人大，打趣去了看看：{}和{}".format(str1, str2))`,
                 mnemonic: "format函数格式化，变量填入花括号",
-                keyPoints: "字符串格式化、输入输出",
                 importance: "⭐⭐"
             }
         ];
@@ -716,10 +706,6 @@ print("世界达人大，打趣去了看看：{}和{}".format(str1, str2))`,
                     <div class="mnemonic-section">
                         <span class="mnemonic-title">💡 记忆口诀</span>
                         ${question.mnemonic}
-                    </div>
-                    <div class="key-points-section">
-                        <span class="key-points-title">🎯 考点</span>
-                        ${question.keyPoints}
                     </div>
                 `;
                 cardContainer.appendChild(card);
