@@ -50,7 +50,6 @@
             flex-direction: column;
             opacity: 0;
             transition: opacity 0.5s ease, transform 0.5s ease;
-            overflow-y: auto;
             transform: translateY(20px);
         }
         
@@ -101,19 +100,69 @@
             font-weight: bold;
         }
         
-        .code-section {
+        /* 重新设计的代码区域 */
+        .code-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            margin: 15px 0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .code-header {
             background: #2d3748;
             color: #e2e8f0;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 15px 0;
+            padding: 10px 15px;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .code-scroll-wrapper {
+            flex: 1;
+            background: #1a202c;
+            overflow: auto;
+            position: relative;
+        }
+        
+        .code-section {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 15px;
             font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
             font-size: 0.95rem;
             line-height: 1.5;
-            overflow-x: auto;
-            position: relative;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            min-height: 100%;
+            box-sizing: border-box;
             white-space: pre-wrap;
+        }
+        
+        /* 滚动条样式 */
+        .code-scroll-wrapper::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+        
+        .code-scroll-wrapper::-webkit-scrollbar-track {
+            background: #2d3748;
+            border-radius: 0;
+        }
+        
+        .code-scroll-wrapper::-webkit-scrollbar-thumb {
+            background: #4a5568;
+            border-radius: 6px;
+            border: 2px solid #2d3748;
+        }
+        
+        .code-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #718096;
+        }
+        
+        .code-scroll-wrapper::-webkit-scrollbar-corner {
+            background: #2d3748;
         }
         
         .highlight {
@@ -216,6 +265,7 @@
             text-align: center;
             margin-top: 15px;
             font-size: 0.9rem;
+            display: none;
         }
         
         .sidebar-toggle {
@@ -400,7 +450,7 @@
     </div>
 
     <script>
-        // 题目数据 - 按重要程度排序，1、2、3题降低重要性并排到最后
+        // 题目数据
         const questions = [
             {
                 title: "函数与循环结合",
@@ -674,7 +724,7 @@ pensize(5)
 <span class="highlight">angles = [0, 120, 240]</span>
 
 for angle in angles:
-    <span class="highlight">setheading(angle)</span>
+    <span class="highlight">setheading(angle</span>)
     fd(100)
 
 done()`,
@@ -725,7 +775,15 @@ print("世界达人大，打趣去了看看：{}和{}".format(str1, str2))`,
                         <div class="card-number">${index + 1}</div>
                         <div class="importance">${question.importance}</div>
                     </div>
-                    <div class="code-section">${question.code}</div>
+                    <div class="code-container">
+                        <div class="code-header">
+                            <span>Python代码</span>
+                            <span><i class="fas fa-code"></i></span>
+                        </div>
+                        <div class="code-scroll-wrapper">
+                            <div class="code-section">${question.code}</div>
+                        </div>
+                    </div>
                     <div class="mnemonic-section">
                         <span class="mnemonic-title">💡 记忆口诀</span>
                         ${question.mnemonic}
@@ -831,34 +889,6 @@ print("世界达人大，打趣去了看看：{}和{}".format(str1, str2))`,
         sidebarToggle.addEventListener('click', openSidebarMenu);
         closeSidebar.addEventListener('click', closeSidebarMenu);
         overlay.addEventListener('click', closeSidebarMenu);
-
-        // 添加触摸滑动支持
-        let startY = 0;
-        let endY = 0;
-
-        cardContainer.addEventListener('touchstart', (e) => {
-            startY = e.touches[0].clientY;
-        });
-
-        cardContainer.addEventListener('touchend', (e) => {
-            endY = e.changedTouches[0].clientY;
-            handleSwipe();
-        });
-
-        function handleSwipe() {
-            const diff = startY - endY;
-            
-            // 滑动距离超过50px才触发切换
-            if (Math.abs(diff) > 50) {
-                if (diff > 0) {
-                    // 向上滑动，下一题
-                    nextCard();
-                } else {
-                    // 向下滑动，上一题
-                    prevCard();
-                }
-            }
-        }
 
         // 初始化
         createCards();
