@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -728,6 +728,875 @@
 
         // 初始化应用
         document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python期末考点速记卡</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 800px;
+            height: 85vh;
+            position: relative;
+        }
+        
+        .card-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            overflow-y: auto;
+            transform: translateY(20px);
+        }
+        
+        .card.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+            position: relative;
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        .card-number {
+            background: #3498db;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+            z-index: 1;
+        }
+        
+        .importance {
+            position: absolute;
+            top: 15px;
+            right: 60px;
+            background: #e74c3c;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .code-section {
+            background: #2d3748;
+            color: #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            overflow-x: auto;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            white-space: pre-wrap;
+        }
+        
+        .highlight {
+            background: rgba(255, 255, 0, 0.2);
+            padding: 2px 5px;
+            border-radius: 4px;
+            animation: pulse 2s infinite;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        }
+        
+        @keyframes pulse {
+            0% { background-color: rgba(255, 255, 0, 0.2); }
+            50% { background-color: rgba(255, 255, 0, 0.3); }
+            100% { background-color: rgba(255, 255, 0, 0.2); }
+        }
+        
+        .mnemonic-section {
+            background: #fff9e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid #f1c40f;
+        }
+        
+        .mnemonic-title {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 8px;
+            color: #d35400;
+        }
+        
+        .key-points-section {
+            background: #e8f4fd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid #3498db;
+        }
+        
+        .key-points-title {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 8px;
+            color: #2980b9;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            background: #3498db;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 3px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: #3498db;
+            border-radius: 3px;
+            width: 10%;
+            transition: width 0.5s ease;
+        }
+        
+        .swipe-hint {
+            color: #7f8c8d;
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .sidebar-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #3498db;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+            z-index: 1000;
+            transition: transform 0.3s;
+        }
+        
+        .sidebar-toggle:hover {
+            transform: scale(1.1);
+        }
+        
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 999;
+            transition: left 0.3s ease;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .sidebar.active {
+            left: 0;
+        }
+        
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .sidebar-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        .close-sidebar {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #7f8c8d;
+            cursor: pointer;
+        }
+        
+        .question-list {
+            list-style: none;
+        }
+        
+        .question-item {
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .question-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+        
+        .question-item.active {
+            background: #3498db;
+            color: white;
+        }
+        
+        .question-name {
+            font-weight: 500;
+        }
+        
+        .question-importance {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 998;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                height: 80vh;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .card-title {
+                font-size: 1.3rem;
+            }
+            
+            .code-section {
+                font-size: 0.85rem;
+                padding: 15px;
+            }
+            
+            .sidebar {
+                width: 85%;
+                left: -85%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar-toggle" id="sidebarToggle">
+        <i class="fas fa-bars"></i>
+    </div>
+    
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">题目导航</div>
+            <button class="close-sidebar" id="closeSidebar">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <ul class="question-list" id="questionList">
+            <!-- 题目列表将通过JavaScript动态生成 -->
+        </ul>
+    </div>
+    
+    <div class="overlay" id="overlay"></div>
+    
+    <div class="container">
+        <div class="card-container" id="cardContainer">
+            <!-- 卡片将通过JavaScript动态生成 -->
+        </div>
+        
+        <div class="nav-buttons">
+            <button id="prevBtn"><i class="fas fa-arrow-left"></i> 上一题</button>
+            <button id="nextBtn">下一题 <i class="fas fa-arrow-right"></i></button>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+        </div>
+        
+        <div class="swipe-hint">
+            <i class="fas fa-arrows-alt-v"></i> 上下滑动切换题目
+        </div>
+    </div>
+
+    <script>
+        // 题目数据 - 按重要程度排序，1、2、3题降低重要性并排到最后
+        const questions = [
+            {
+                title: "函数与循环结合",
+                code: `def dayUp(<span class="highlight">dayfactor</span>):
+    dayup = 1.0
+    for i in range(1, 366):
+        if i % 7 in [6, 0]:
+            dayup = dayup * (1 - 0.01)
+        else:
+            dayup = dayup * (1 + dayfactor)
+    return dayup
+
+df = 0.01
+while dayUp(df) < pow(1.01, 365):
+    df += 0.001
+print("每天需要为: {:.3f}".format(df))`,
+                mnemonic: "函数封装循环体，参数控制增长率",
+                keyPoints: "函数定义、循环嵌套、条件判断",
+                importance: "⭐⭐⭐⭐⭐"
+            },
+            {
+                title: "周期增长模型",
+                code: `dayup = 1.0
+dayfactor = 0.01
+for i in range(1, 366):
+    <span class="highlight">if i % 5 in [4, 0]:</span>  # 三天打鱼两天晒网
+        dayup = dayup * (1 - dayfactor)
+    else:
+        dayup = dayup * (1 + dayfactor)
+print("整天打鱼两天晒网的结果: {:.2f}".format(dayup))`,
+                mnemonic: "模5判断打鱼晒网",
+                keyPoints: "模运算、条件分支、周期计算",
+                importance: "⭐⭐⭐⭐"
+            },
+            {
+                title: "回文数判断",
+                code: `num = input("请输入5位数：")
+<span class="highlight">if num == num[::-1]:</span>
+    print(f'{num}是回文数')
+else:
+    print(f'{num}不是回文数')`,
+                mnemonic: "字符串反转，相等是回文",
+                keyPoints: "字符串切片、回文判断",
+                importance: "⭐⭐⭐⭐"
+            },
+            {
+                title: "三数比较大小",
+                code: `num1 = eval(input("第一个数："))
+num2 = eval(input("第二个数："))
+num3 = eval(input("第三个数："))
+
+<span class="highlight">if num1 > num2:
+    if num1 > num3:
+        max_num = num1
+    else:
+        max_num = num3
+else:
+    if num2 > num3:
+        max_num = num2
+    else:
+        max_num = num3</span>
+
+print("最大值为：", max_num)`,
+                mnemonic: "嵌套if比大小，先比前两（后两），再比三",
+                keyPoints: "嵌套if语句、多条件判断",
+                importance: "⭐⭐⭐⭐"
+            },
+            {
+                title: "BMI计算程序",
+                code: `height, weight = eval(input("身高(m)和体重(kg)，用逗号分隔："))
+<span class="highlight">bmi = weight / pow(height, 2)</span>
+print("BMI数值为：{:.2f}".format(bmi))
+
+who = ""
+dom = ""
+
+if bmi < 18.5:
+    who = "偏瘦"
+elif bmi < 25:
+    who = "正常"
+elif bmi < 30:
+    who = "偏胖"
+else:
+    who = "肥胖"
+
+print("BMI指标：国际'{0}'，国内'{1}'".format(who, dom))`,
+                mnemonic: "体重除身高平方，多条件分类BMI",
+                keyPoints: "数学计算、多分支if-elif",
+                importance: "⭐⭐⭐⭐"
+            },
+            {
+                title: "字符分类统计",
+                code: `s = input("输入字符串：")
+English = 0
+digit = 0
+space = 0
+other = 0
+
+for c in s:
+    <span class="highlight">if 'A' <= c <= 'Z' or 'a' <= c <= 'z':</span>
+        English += 1
+    elif <span class="highlight">c.isdigit()</span>:
+        digit += 1
+    elif <span class="highlight">c.isspace()</span>:
+        space += 1
+    else:
+        other += 1
+
+print("英文字母：{}，数字：{}，空格：{}，其他：{}".format(English, digit, space, other))`,
+                mnemonic: "字符遍历分类计，字母数字空格其他",
+                keyPoints: "字符判断、计数器使用",
+                importance: "⭐⭐⭐⭐"
+            },
+            {
+                title: "闰年判断",
+                code: `year = int(input("年份："))
+<span class="highlight">if (year % 4 == 0 and year % 100 != 0) or (year % 400 == 0):</span>
+    print(f"{year}年是闰年")
+else:
+    print(f"{year}年不是闰年")`,
+                mnemonic: "四年一闰，百年不闰，四百年再闰",
+                keyPoints: "逻辑运算符、闰年算法",
+                importance: "⭐⭐⭐⭐"
+            },
+            {
+                title: "温度转换程序",
+                code: `temp = eval(input("请输入温度数值："))
+unit = input("请输入温度符号（C/F）：")
+
+<span class="highlight">if unit in ["F", "f"]:
+    C = (temp - 32) / 1.8
+    print("转换后的温度值是：{:.2f}°C".format(C))
+elif unit in ["C", "c"]:
+    F = 1.8 * temp + 32
+    print("转换后的温度值是：{:.2f}°F".format(F))</span>
+else:
+    print("输入格式错误！")`,
+                mnemonic: "摄氏减32除1.8，华氏乘1.8加32",
+                keyPoints: "条件判断、数学公式",
+                importance: "⭐⭐⭐⭐"
+            },
+            {
+                title: "九九乘法表",
+                code: `for i in range(1, 10):
+    for j in range(1, i + 1):
+        <span class="highlight">print("{}*{}={:2} ".format(j, i, j * i), end="")</span>
+    print()`,
+                mnemonic: "双重循环打印表，内循环到i+1，format对齐输出",
+                keyPoints: "双重循环、字符串格式化",
+                importance: "⭐⭐⭐⭐"
+            },
+            {
+                title: "水仙花数",
+                code: `for num in range(100, 1000):
+    <span class="highlight">b = num // 100
+    s = (num // 10) % 10
+    g = num % 10</span>
+    if num == b**3 + s**3 + g**3:
+        print(num)`,
+                mnemonic: "百位整除100，十位整除10再模10，个位直接模10",
+                keyPoints: "数字分解、水仙花数判断",
+                importance: "⭐⭐⭐⭐"
+            },
+            {
+                title: "进度条显示",
+                code: `import time
+scale = 10
+
+for i in range(scale + 1):
+    <span class="highlight">a = '**' * i</span>
+    <span class="highlight">b = '..' * (scale - i)</span>
+    <span class="highlight">c = (i / scale) * 100</span>
+    print('[{:>3.0f}%] [{}->{}]'.format(c, a, b))
+    time.sleep(0.1)`,
+                mnemonic: "星号点号拼进度，百分比算完成度",
+                keyPoints: "字符串重复、百分比计算",
+                importance: "⭐⭐⭐"
+            },
+            {
+                title: "单行刷新进度条",
+                code: `import time
+for i in range(101):
+    <span class="highlight">print('\\r{:>3}%'.format(i), end='')</span>  # '\\r' 回车
+    time.sleep(0.05)`,
+                mnemonic: "回车符\\r单行刷，end=''不换行",
+                keyPoints: "转义字符\\r、print不换行",
+                importance: "⭐⭐⭐"
+            },
+            {
+                title: "地球与月球体重计算",
+                code: `weight = float(input("请输入体重（kg）："))
+for year in range(1, 11):
+    weight += 0.5
+    <span class="highlight">moon_weight = weight * 0.165</span>
+    print('第{}年：地球: {:.2f}kg 月球: {:.2f}kg'.format(year, weight, moon_weight))`,
+                mnemonic: "体重乘0.165，地球月球比重量",
+                keyPoints: "循环计算、变量更新、格式化输出",
+                importance: "⭐⭐⭐"
+            },
+            {
+                title: "汇率兑换程序",
+                code: `money = input("请输入币值及类型（如100D或500Y）：")
+<span class="highlight">if money[-1] in ["D", "d"]:
+    RMB = eval(money[:-1]) * 6.6
+    print("兑换人民币：{:.2f}".format(RMB))
+elif money[-1] in ["Y", "y"]:
+    USD = eval(money[:-1]) / 6.6
+    print("兑换美元：{:.2f}".format(USD))</span>
+else:
+    print("输入格式错误！")`,
+                mnemonic: "取数值：字符串切片，判类型：末尾字符",
+                keyPoints: "字符串切片、类型判断",
+                importance: "⭐⭐⭐"
+            },
+            {
+                title: "找零钱程序",
+                code: `money = eval(input("输入金额："))
+<span class="highlight">m50 = money // 50
+money = money % 50
+m5 = money // 5
+money = money % 5
+m1 = money</span>
+
+print("50元纸币的张数：", m50)
+print("5元纸币的张数：", m5)
+print("1元纸币的张数：", m1)`,
+                mnemonic: "整除得张数，取余得余钱",
+                keyPoints: "整除//、取余%运算",
+                importance: "⭐⭐⭐"
+            },
+            {
+                title: "整数序列求和",
+                code: `n = int(input("请输入整数n："))
+total = 0
+for i in range(1, n + 1):
+    <span class="highlight">total += i</span>
+print("1到N之和：", total)`,
+                mnemonic: "range从1到n+1（左闭右开），累加器求和",
+                keyPoints: "range函数、累加求和",
+                importance: "⭐⭐⭐"
+            },
+            {
+                title: "彩色解码绘制",
+                code: `from turtle import *
+
+penup()
+fd(20)
+pendown()
+pensize(8)
+<span class="highlight">colors = ['red', 'orange', 'yellow', 'green']</span>
+
+for i in range(4):
+    <span class="highlight">pencolor(colors[i % len(colors)])</span>
+    circle(40, 80)
+    circle(-40, 80)
+
+circle(40, 40)
+fd(40)
+circle(10, 180)
+fd(40 * 2 / 3)
+done()`,
+                mnemonic: "颜色循环画四边",
+                keyPoints: "turtle颜色控制、循环绘图",
+                importance: "⭐⭐"
+            },
+            {
+                title: "三角形角度控制",
+                code: `from turtle import *
+
+pensize(5)
+<span class="highlight">angles = [0, 120, 240]</span>
+
+for angle in angles:
+    <span class="highlight">setheading(angle)</span>
+    fd(100)
+
+done()`,
+                mnemonic: "120度转三角",
+                keyPoints: "角度设置、循环绘制几何图形",
+                importance: "⭐⭐"
+            },
+            {
+                title: "复利增长计算",
+                code: `<span class="highlight">dayup = pow(1.01, 365)</span>  # 每天进步1%
+<span class="highlight">daydown = pow(0.99, 365)</span>  # 每天退步1%
+print("向上: {:.2f}, 向下: {:.2f}".format(dayup, daydown))`,
+                mnemonic: "幂运算算复利，进步退步看指数",
+                keyPoints: "pow()函数、复利计算",
+                importance: "⭐⭐"
+            },
+            {
+                title: "字符串拼接",
+                code: `str1 = input("请输入第一个名字：")
+str2 = input("请输入第二个名字：")
+print("世界达人大，打趣去了看看：{}和{}".format(str1, str2))`,
+                mnemonic: "format函数格式化，变量填入花括号",
+                keyPoints: "字符串格式化、输入输出",
+                importance: "⭐⭐"
+            }
+        ];
+
+        // 初始化变量
+        let currentIndex = 0;
+        const cardContainer = document.getElementById('cardContainer');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const progress = document.getElementById('progress');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.getElementById('sidebar');
+        const closeSidebar = document.getElementById('closeSidebar');
+        const overlay = document.getElementById('overlay');
+        const questionList = document.getElementById('questionList');
+
+        // 创建卡片
+        function createCards() {
+            questions.forEach((question, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div class="card-title">${question.title}</div>
+                        <div class="card-number">${index + 1}</div>
+                        <div class="importance">${question.importance}</div>
+                    </div>
+                    <div class="code-section">${question.code}</div>
+                    <div class="mnemonic-section">
+                        <span class="mnemonic-title">💡 记忆口诀</span>
+                        ${question.mnemonic}
+                    </div>
+                    <div class="key-points-section">
+                        <span class="key-points-title">🎯 考点</span>
+                        ${question.keyPoints}
+                    </div>
+                `;
+                cardContainer.appendChild(card);
+            });
+            
+            // 设置第一张卡片为激活状态
+            document.querySelectorAll('.card')[0].classList.add('active');
+            updateProgress();
+        }
+
+        // 创建侧边栏题目列表
+        function createQuestionList() {
+            questions.forEach((question, index) => {
+                const listItem = document.createElement('li');
+                listItem.className = 'question-item';
+                if (index === 0) listItem.classList.add('active');
+                listItem.innerHTML = `
+                    <span class="question-name">${index + 1}. ${question.title}</span>
+                    <span class="question-importance">${question.importance}</span>
+                `;
+                listItem.addEventListener('click', () => {
+                    currentIndex = index;
+                    showCard(currentIndex);
+                    closeSidebarMenu();
+                    updateQuestionList();
+                });
+                questionList.appendChild(listItem);
+            });
+        }
+
+        // 更新侧边栏题目列表激活状态
+        function updateQuestionList() {
+            document.querySelectorAll('.question-item').forEach((item, index) => {
+                if (index === currentIndex) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
+
+        // 更新进度条
+        function updateProgress() {
+            const progressPercent = ((currentIndex + 1) / questions.length) * 100;
+            progress.style.width = `${progressPercent}%`;
+        }
+
+        // 显示指定索引的卡片
+        function showCard(index) {
+            // 隐藏所有卡片
+            document.querySelectorAll('.card').forEach(card => {
+                card.classList.remove('active');
+            });
+            
+            // 显示当前卡片
+            document.querySelectorAll('.card')[index].classList.add('active');
+            
+            // 更新进度条
+            updateProgress();
+            
+            // 更新侧边栏题目列表
+            updateQuestionList();
+        }
+
+        // 下一张卡片
+        function nextCard() {
+            if (currentIndex < questions.length - 1) {
+                currentIndex++;
+                showCard(currentIndex);
+            }
+        }
+
+        // 上一张卡片
+        function prevCard() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                showCard(currentIndex);
+            }
+        }
+
+        // 打开侧边栏菜单
+        function openSidebarMenu() {
+            sidebar.classList.add('active');
+            overlay.classList.add('active');
+        }
+
+        // 关闭侧边栏菜单
+        function closeSidebarMenu() {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        }
+
+        // 添加按钮事件监听
+        prevBtn.addEventListener('click', prevCard);
+        nextBtn.addEventListener('click', nextCard);
+        sidebarToggle.addEventListener('click', openSidebarMenu);
+        closeSidebar.addEventListener('click', closeSidebarMenu);
+        overlay.addEventListener('click', closeSidebarMenu);
+
+        // 添加触摸滑动支持
+        let startY = 0;
+        let endY = 0;
+
+        cardContainer.addEventListener('touchstart', (e) => {
+            startY = e.touches[0].clientY;
+        });
+
+        cardContainer.addEventListener('touchend', (e) => {
+            endY = e.changedTouches[0].clientY;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            const diff = startY - endY;
+            
+            // 滑动距离超过50px才触发切换
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) {
+                    // 向上滑动，下一题
+                    nextCard();
+                } else {
+                    // 向下滑动，上一题
+                    prevCard();
+                }
+            }
+        }
+
+        // 初始化
+        createCards();
+        createQuestionList();
     </script>
 </body>
 </html>
