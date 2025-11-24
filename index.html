@@ -676,6 +676,108 @@ str2 = input("请输入第二个名字：")
 print("世界达人大，打趣去了看看：{}和{}".format(str1, str2))`,
                 mnemonic: "format函数格式化，变量填入花括号",
                 importance: "⭐⭐"
+            },
+            {
+                title: "字符串拼接",
+                code: `str1 = input("请输入第一个名字：")
+str2 = input("请输入第二个名字：")
+print("世界达人大，打趣去了看看：{}和{}".format(str1, str2))`,
+                mnemonic: "format函数格式化，变量填入花括号",
+                keyPoints: "字符串格式化、输入输出",
+                importance: "⭐⭐"
+            },
+            {
+                title: "P94-html",
+                code: `body
+    <span class="highlight">form
+        label ... /label
+        input
+    /form</span>
+
+    table
+        <span class="highlight">thead
+            tr
+                th ... /th
+            /tr
+        /thead</span>
+
+        <span class="highlight">tbody id="tableBody"
+                空着
+        /tbody</span>
+    /table
+
+    <span class="highlight">script
+            // JavaScript代码将在这里,查看下页 →戳我
+    /script</span>
+/body
+ `,
+                mnemonic: "",
+                keyPoints: "",
+                importance: "⭐⭐"
+            },
+            {
+                title: "P94-js",
+                code: `// 定义学生信息二维数组
+var student = [
+    ["张三", 29, "软件工程"],
+    ["李四", 17, "计算机"],
+    ["王五", 18, "软件工程"]
+];
+
+var table = document.getElementById("table");
+
+
+for(var i = 0; <span class="highlight">i < student.length;</span> i++) {
+    addRow(student<span class="highlight">[i]</span>);
+}</span>
+
+function addRow(<span class="highlight">array</span>){
+    var tr = document.createElement("tr"); <span class="highlight">//tr是行</span>
+    
+    // 遍历学生信息
+    for(var i = 0; i < array.length; i++) {
+        var td = document.createElement("td"); <span class="highlight">//td是列，先行后列 OK？(⊙o⊙)？</span>
+        td.innerText = array<span class="highlight">[i]</span>;
+        tr.appendChild(<span class="highlight">td</span>);
+    }
+    
+    // "删除"按钮
+    var td = document.createElement("td");
+    td.innerHTML = " button 删除 /button ";
+    tr.appendChild(<span class="highlight">td</span>);
+    
+    
+    table.querySelector('tbody').appendChild(tr);
+}
+
+document.getElementById("addForm").onclick = function(e){
+    var name = document.getElementById("stu_name"); <span class="highlight">//stu是学生，_英文下划线</span>
+    var age = document.getElementById("stu_age");       
+    var major = document.getElementById("stu_major");<span class="highlight">//别弄错了(╯▔皿▔)╯</span>
+    
+    // 新增
+    addRow([name.value, age.value, major.value]);<span class="highlight">//小数点.别漏了:D</span>
+    
+    // 阻止表单默认提交事件
+    e.preventDefault();
+    
+    // 清空表单输入框
+    name.value = "";
+    age.value = "";
+    major.value = "";
+}
+
+// 删除学生信息功能（使用事件委托）
+table.addEventListener("click", function(e){
+    if(e.target.<span class="highlight">nodeName</span> == "BUTTON"){
+        // 删除该按钮所在的行
+        table.querySelector('tbody').removeChild(e.target.<span class="highlight">parentNode.parentNode</span>);
+    }
+});
+ `,
+                mnemonic: "",
+                keyPoints: "",
+                importance: "⭐⭐"
             }
         ];
 
