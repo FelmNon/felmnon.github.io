@@ -1,2448 +1,925 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>城超通 · 苏超球迷文旅平台</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=ZCOOL+XiaoWei&family=Oswald:wght@400;700&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --jade: #1a6b4a;
-    --jade-light: #2d9469;
-    --gold: #e8a020;
-    --gold-light: #f5c842;
-    --red: #c0392b;
-    --ink: #0d1a12;
-    --paper: #faf6ee;
-    --paper2: #f0ead8;
-    --mist: #e8f0ec;
-    --text: #1a2e1e;
-    --text2: #4a6350;
-    --white: #ffffff;
-  }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>苏超看球助手 MVP</title>
+  <style>
+    * { box-sizing: border-box; }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #f5f7fb;
+      color: #1f2937;
+    }
 
-  html { font-size: 16px; scroll-behavior: smooth; }
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
 
-  body {
-    background: var(--ink);
-    color: var(--text);
-    font-family: 'Noto Serif SC', serif;
-    overflow-x: hidden;
-    min-height: 100vh;
-  }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
+    }
 
-  /* ── SPLASH SCREEN ── */
-  #splash {
-    position: fixed; inset: 0; z-index: 9999;
-    background: var(--ink);
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    transition: opacity .6s ease, visibility .6s ease;
-  }
-  #splash.hide { opacity: 0; visibility: hidden; }
+    .sub {
+      color: #6b7280;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
 
-  .splash-ball {
-    width: 90px; height: 90px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 35%, #fff 0%, var(--jade-light) 40%, var(--jade) 100%);
-    box-shadow: 0 0 40px rgba(45,148,105,.6), inset 0 0 20px rgba(0,0,0,.3);
-    animation: bounceSplash 1s ease-in-out infinite alternate;
-    position: relative;
-    overflow: hidden;
-  }
-  .splash-ball::after {
-    content: '';
-    position: absolute; inset: 0;
-    background: repeating-conic-gradient(rgba(255,255,255,.12) 0deg 30deg, transparent 30deg 60deg);
-    border-radius: 50%;
-  }
-  @keyframes bounceSplash {
-    from { transform: translateY(0) scale(1); }
-    to { transform: translateY(-18px) scale(1.06); }
-  }
+    .grid {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 20px;
+    }
 
-  .splash-title {
-    margin-top: 28px;
-    font-family: 'ZCOOL XiaoWei', serif;
-    font-size: 42px;
-    color: var(--gold);
-    letter-spacing: 8px;
-    text-shadow: 0 0 30px rgba(232,160,32,.5);
-  }
-  .splash-sub {
-    margin-top: 8px;
-    font-size: 13px;
-    color: rgba(255,255,255,.5);
-    letter-spacing: 3px;
-  }
-  .splash-loader {
-    margin-top: 48px;
-    width: 120px; height: 2px;
-    background: rgba(255,255,255,.1);
-    border-radius: 2px;
-    overflow: hidden;
-  }
-  .splash-loader-bar {
-    height: 100%; width: 0;
-    background: linear-gradient(90deg, var(--jade), var(--gold));
-    border-radius: 2px;
-    animation: loadBar 1.8s ease forwards;
-  }
-  @keyframes loadBar { to { width: 100%; } }
+    .card {
+      background: #fff;
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    }
 
-  /* ── APP WRAPPER ── */
-  #app {
-    max-width: 420px;
-    margin: 0 auto;
-    background: var(--paper);
-    min-height: 100vh;
-    position: relative;
-    overflow: hidden;
-  }
+    label {
+      display: block;
+      margin: 14px 0 8px;
+      font-weight: 600;
+    }
 
-  /* ── NAV BAR ── */
-  .nav-bar {
-    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-    width: 100%; max-width: 420px;
-    background: var(--ink);
-    display: flex;
-    border-top: 1px solid rgba(45,148,105,.3);
-    z-index: 100;
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-  .nav-item {
-    flex: 1; display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    padding: 10px 0 8px;
-    cursor: pointer;
-    transition: all .2s;
-    position: relative;
-  }
-  .nav-item.active .nav-icon { color: var(--gold); }
-  .nav-item.active .nav-label { color: var(--gold); }
-  .nav-item .nav-icon { font-size: 20px; color: rgba(255,255,255,.4); transition: color .2s; }
-  .nav-item .nav-label { font-size: 10px; color: rgba(255,255,255,.35); margin-top: 3px; letter-spacing: 1px; transition: color .2s; }
-  .nav-item.active::before {
-    content: '';
-    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-    width: 32px; height: 2px;
-    background: var(--gold);
-    border-radius: 0 0 2px 2px;
-  }
+    input, select, button {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid #d1d5db;
+      padding: 12px 14px;
+      font-size: 15px;
+    }
 
-  /* ── PAGES ── */
-  .page { display: none; padding-bottom: 80px; min-height: 100vh; }
-  .page.active { display: block; }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
 
-  /* ══════════════════════════════════
-     PAGE 1 — HOME
-  ══════════════════════════════════ */
-  .home-hero {
-    background: linear-gradient(160deg, var(--ink) 0%, #0f3320 60%, #1a5c38 100%);
-    padding: 0 0 24px;
-    position: relative;
-    overflow: hidden;
-  }
-  .home-hero::before {
-    content: '';
-    position: absolute; inset: 0;
-    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%232d9469' fill-opacity='0.07'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-  }
+    button {
+      margin-top: 16px;
+      background: #111827;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+    }
 
-  .home-topbar {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 52px 20px 0;
-    position: relative; z-index: 1;
-  }
-  .home-logo {
-    font-family: 'ZCOOL XiaoWei', serif;
-    font-size: 26px; color: var(--gold);
-    letter-spacing: 4px;
-    text-shadow: 0 0 20px rgba(232,160,32,.4);
-  }
-  .home-logo span { color: var(--jade-light); }
-  .home-notif {
-    width: 36px; height: 36px;
-    background: rgba(255,255,255,.08);
-    border-radius: 50%; border: 1px solid rgba(255,255,255,.15);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 17px; cursor: pointer;
-    position: relative;
-  }
-  .notif-dot {
-    position: absolute; top: 6px; right: 7px;
-    width: 7px; height: 7px;
-    background: var(--red); border-radius: 50%;
-    border: 1px solid var(--ink);
-  }
+    button:hover { opacity: 0.95; }
 
-  /* Next match card */
-  .next-match {
-    margin: 20px 16px 0;
-    background: rgba(255,255,255,.06);
-    border: 1px solid rgba(45,148,105,.35);
-    border-radius: 16px;
-    padding: 18px 16px;
-    position: relative; z-index: 1;
-    backdrop-filter: blur(10px);
-  }
-  .match-badge {
-    display: inline-flex; align-items: center; gap: 5px;
-    background: rgba(232,160,32,.15);
-    border: 1px solid rgba(232,160,32,.4);
-    border-radius: 20px;
-    padding: 3px 10px;
-    font-size: 11px; color: var(--gold-light);
-    letter-spacing: 1px; margin-bottom: 14px;
-  }
-  .match-badge::before { content: '🏆'; font-size: 10px; }
-  .match-teams {
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .team-block { text-align: center; flex: 1; }
-  .team-emoji { font-size: 36px; line-height: 1; }
-  .team-name { font-size: 14px; color: rgba(255,255,255,.9); font-weight: 700; margin-top: 6px; }
-  .team-city { font-size: 11px; color: rgba(255,255,255,.45); margin-top: 2px; }
-  .match-vs {
-    flex: 0 0 60px; text-align: center;
-  }
-  .vs-text {
-    font-family: 'Oswald', sans-serif;
-    font-size: 28px; color: var(--gold);
-    font-weight: 700;
-  }
-  .match-time {
-    font-size: 11px; color: rgba(255,255,255,.5);
-    margin-top: 4px;
-  }
-  .match-actions {
-    display: flex; gap: 10px; margin-top: 16px;
-  }
-  .btn-ticket {
-    flex: 1; background: linear-gradient(135deg, var(--gold), #c8840a);
-    border: none; border-radius: 10px; padding: 11px;
-    font-family: 'Noto Serif SC', serif; font-size: 13px; font-weight: 700;
-    color: var(--ink); cursor: pointer;
-    box-shadow: 0 4px 16px rgba(232,160,32,.35);
-    transition: all .2s;
-  }
-  .btn-ticket:active { transform: scale(.97); }
-  .btn-route {
-    flex: 1; background: rgba(255,255,255,.08);
-    border: 1px solid rgba(45,148,105,.4);
-    border-radius: 10px; padding: 11px;
-    font-family: 'Noto Serif SC', serif; font-size: 13px;
-    color: rgba(255,255,255,.8); cursor: pointer;
-    transition: all .2s;
-  }
-  .btn-route:active { transform: scale(.97); }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
 
-  /* Section title */
-  .section-title {
-    padding: 22px 16px 12px;
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .section-title h3 {
-    font-size: 17px; font-weight: 900; color: var(--ink);
-    display: flex; align-items: center; gap: 6px;
-  }
-  .section-title h3::before {
-    content: '';
-    width: 4px; height: 18px;
-    background: linear-gradient(to bottom, var(--gold), var(--jade));
-    border-radius: 2px;
-    display: inline-block;
-  }
-  .section-more { font-size: 12px; color: var(--jade); }
+    .hint {
+      margin-top: 12px;
+      font-size: 13px;
+      color: #6b7280;
+      line-height: 1.7;
+    }
 
-  /* Schedule list */
-  .schedule-list { padding: 0 16px; display: flex; flex-direction: column; gap: 10px; }
-  .schedule-card {
-    background: var(--white);
-    border-radius: 14px;
-    padding: 14px 16px;
-    display: flex; align-items: center; justify-content: space-between;
-    box-shadow: 0 2px 12px rgba(0,0,0,.06);
-    border-left: 3px solid var(--jade);
-    cursor: pointer; transition: all .2s;
-  }
-  .schedule-card:active { transform: scale(.98); }
-  .sch-left { display: flex; flex-direction: column; gap: 3px; }
-  .sch-teams { font-size: 14px; font-weight: 700; color: var(--ink); }
-  .sch-meta { font-size: 11px; color: var(--text2); }
-  .sch-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
-  .sch-date { font-size: 12px; color: var(--text2); }
-  .sch-status {
-    font-size: 11px; padding: 3px 8px; border-radius: 20px;
-    font-weight: 700;
-  }
-  .sch-status.hot { background: rgba(192,57,43,.1); color: var(--red); }
-  .sch-status.ok { background: rgba(45,148,105,.1); color: var(--jade); }
-  .sch-status.soon { background: rgba(232,160,32,.1); color: var(--gold); }
+    .status {
+      margin-top: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      display: none;
+    }
 
-  /* Hot cities scroll */
-  .cities-scroll { overflow-x: auto; padding: 0 16px 4px; display: flex; gap: 10px; scrollbar-width: none; }
-  .cities-scroll::-webkit-scrollbar { display: none; }
-  .city-chip {
-    flex: 0 0 auto;
-    background: var(--white);
-    border-radius: 12px;
-    padding: 10px 14px;
-    display: flex; flex-direction: column; align-items: center; gap: 4px;
-    box-shadow: 0 2px 10px rgba(0,0,0,.07);
-    cursor: pointer; transition: all .2s;
-    border: 1.5px solid transparent;
-  }
-  .city-chip.active { border-color: var(--jade); background: var(--mist); }
-  .city-chip:active { transform: scale(.95); }
-  .city-emoji { font-size: 22px; }
-  .city-name { font-size: 12px; font-weight: 700; color: var(--ink); }
-  .city-team { font-size: 10px; color: var(--text2); }
+    .status.info { color: #2563eb; }
+    .status.error { color: #dc2626; }
 
-  /* ══════════════════════════════════
-     PAGE 2 — TOURISM
-  ══════════════════════════════════ */
-  .tour-hero {
-    background: linear-gradient(145deg, #0d1a12 0%, #1e4d2f 50%, #2d6b42 100%);
-    padding: 56px 16px 24px;
-    position: relative; overflow: hidden;
-  }
-  .tour-hero::after {
-    content: '江苏';
-    position: absolute; right: -10px; bottom: -20px;
-    font-family: 'ZCOOL XiaoWei', serif;
-    font-size: 120px; color: rgba(255,255,255,.04);
-    letter-spacing: -5px;
-    pointer-events: none;
-  }
-  .tour-title {
-    font-family: 'ZCOOL XiaoWei', serif;
-    font-size: 26px; color: var(--gold);
-    letter-spacing: 3px; line-height: 1.3;
-  }
-  .tour-subtitle { font-size: 13px; color: rgba(255,255,255,.55); margin-top: 6px; }
+    #map {
+      width: 100%;
+      height: 560px;
+      border-radius: 18px;
+      overflow: hidden;
+      background: #eef2ff;
+    }
 
-  .tour-tabs {
-    display: flex; gap: 0;
-    margin: 16px 16px 0;
-    background: rgba(255,255,255,.08);
-    border-radius: 12px;
-    padding: 3px;
-    position: relative; z-index: 1;
-  }
-  .tour-tab {
-    flex: 1; padding: 9px; text-align: center;
-    font-size: 13px; color: rgba(255,255,255,.5);
-    cursor: pointer; border-radius: 10px; transition: all .25s;
-  }
-  .tour-tab.active { background: var(--jade); color: white; font-weight: 700; }
+    .map-legend {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      margin-top: 10px;
+      font-size: 13px;
+      color: #4b5563;
+    }
 
-  .route-cards { padding: 16px; display: flex; flex-direction: column; gap: 14px; }
-  .route-card {
-    background: var(--white); border-radius: 18px;
-    overflow: hidden;
-    box-shadow: 0 4px 20px rgba(0,0,0,.08);
-    cursor: pointer; transition: all .25s;
-  }
-  .route-card:active { transform: scale(.98); }
-  .route-img {
-    height: 160px;
-    display: flex; align-items: center; justify-content: center;
-    position: relative; overflow: hidden;
-    font-size: 60px;
-  }
-  .route-img.nj { background: linear-gradient(135deg, #1a3a5c, #2a6496); }
-  .route-img.sz { background: linear-gradient(135deg, #3d1a5c, #7b3fa0); }
-  .route-img.cz { background: linear-gradient(135deg, #3d2a0a, #a06420); }
-  .route-img.yc { background: linear-gradient(135deg, #0a2a3d, #1a6b8a); }
-  .route-img.xz { background: linear-gradient(135deg, #3a0a0a, #8b2020); }
-  .route-img.sq { background: linear-gradient(135deg, #0a1a3a, #1a3a7a); }
-  .route-img.yz { background: linear-gradient(135deg, #1a2a0a, #3a6a1a); }
-  .route-img.zj { background: linear-gradient(135deg, #2a0a2a, #6a1a6a); }
-  .route-img.ha { background: linear-gradient(135deg, #0a2a1a, #1a5a3a); }
-  .route-img.lyg { background: linear-gradient(135deg, #0a1a2a, #1a4a6a); }
-  .route-img.wx { background: linear-gradient(135deg, #2a1a0a, #6a4a1a); }
-  .route-img.tz { background: linear-gradient(135deg, #1a0a2a, #4a2a6a); }
-  .route-img.nt { background: linear-gradient(135deg, #0a2a2a, #1a6a5a); }
-  .route-img-overlay {
-    position: absolute; inset: 0;
-    background: linear-gradient(to top, rgba(0,0,0,.7) 0%, transparent 60%);
-  }
-  .route-img-text {
-    position: absolute; bottom: 12px; left: 14px;
-    color: white; font-size: 18px; font-weight: 900;
-    z-index: 1;
-  }
-  .route-img-badge {
-    position: absolute; top: 12px; right: 12px;
-    background: var(--gold); color: var(--ink);
-    font-size: 11px; font-weight: 700;
-    padding: 4px 9px; border-radius: 20px;
-    z-index: 1;
-  }
-  .route-body { padding: 14px 16px 16px; }
-  .route-name { font-size: 16px; font-weight: 900; color: var(--ink); }
-  .route-desc { font-size: 12px; color: var(--text2); margin-top: 5px; line-height: 1.6; }
-  .route-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-  .route-tag {
-    font-size: 11px; padding: 4px 9px;
-    border-radius: 20px; border: 1px solid;
-  }
-  .route-tag.food { border-color: var(--gold); color: var(--gold); background: rgba(232,160,32,.08); }
-  .route-tag.scene { border-color: var(--jade); color: var(--jade); background: rgba(26,107,74,.08); }
-  .route-tag.night { border-color: var(--red); color: var(--red); background: rgba(192,57,43,.08); }
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
 
-  .specialty-section { padding: 0 16px 16px; }
-  .specialty-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
-  .specialty-item {
-    background: var(--white); border-radius: 14px;
-    padding: 14px; text-align: center;
-    box-shadow: 0 2px 10px rgba(0,0,0,.06);
-    cursor: pointer; transition: all .2s;
-  }
-  .specialty-item:active { transform: scale(.96); }
-  .spec-emoji { font-size: 30px; }
-  .spec-name { font-size: 13px; font-weight: 700; color: var(--ink); margin-top: 6px; }
-  .spec-city { font-size: 11px; color: var(--text2); margin-top: 2px; }
-  .spec-meme {
-    font-size: 10px; color: var(--jade);
-    margin-top: 4px; font-style: italic;
-  }
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      display: inline-block;
+    }
 
-  /* ══════════════════════════════════
-     PAGE 3 — COMMUNITY
-  ══════════════════════════════════ */
-  .comm-hero {
-    background: linear-gradient(145deg, #1a0808 0%, #4a1010 50%, #6b1e1e 100%);
-    padding: 56px 16px 20px;
-    position: relative; overflow: hidden;
-  }
-  .comm-hero::after {
-    content: '⚔';
-    position: absolute; right: 16px; top: 40px;
-    font-size: 80px; opacity: .08;
-    pointer-events: none;
-  }
-  .comm-title {
-    font-family: 'ZCOOL XiaoWei', serif;
-    font-size: 26px; color: #ff8585;
-    letter-spacing: 2px;
-  }
-  .comm-subtitle { font-size: 12px; color: rgba(255,255,255,.5); margin-top: 5px; }
+    .legend-dot.food {
+      background: #2563eb;
+    }
 
-  .war-banner {
-    margin: 16px 16px 0;
-    background: linear-gradient(135deg, rgba(192,57,43,.15), rgba(139,0,0,.2));
-    border: 1px solid rgba(192,57,43,.4);
-    border-radius: 16px;
-    padding: 16px;
-    display: flex; align-items: center;
-    gap: 12px; cursor: pointer;
-    position: relative; z-index: 1;
-  }
-  .war-emoji { font-size: 32px; }
-  .war-text h4 { font-size: 16px; color: #ff8585; font-weight: 900; }
-  .war-text p { font-size: 12px; color: rgba(255,255,255,.5); margin-top: 3px; }
-  .war-badge {
-    position: absolute; top: -6px; right: 12px;
-    background: var(--red); color: white;
-    font-size: 10px; font-weight: 700;
-    padding: 3px 8px; border-radius: 20px;
-  }
+    .legend-dot.spot {
+      background: #16a34a;
+    }
 
-  .posts-list { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
-  .post-card {
-    background: var(--white); border-radius: 16px;
-    padding: 14px 16px;
-    box-shadow: 0 2px 12px rgba(0,0,0,.06);
-    cursor: pointer; transition: all .2s;
-  }
-  .post-card:active { transform: scale(.98); }
-  .post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-  .post-avatar {
-    width: 36px; height: 36px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
-    flex-shrink: 0;
-  }
-  .post-avatar.nj { background: linear-gradient(135deg, #1a3a5c, #2a6496); }
-  .post-avatar.xz { background: linear-gradient(135deg, #2a0a0a, #8b1a1a); }
-  .post-avatar.sz { background: linear-gradient(135deg, #3d1a5c, #7b3fa0); }
-  .post-avatar.cz { background: linear-gradient(135deg, #3d2a0a, #a06420); }
-  .post-user h5 { font-size: 14px; font-weight: 700; color: var(--ink); }
-  .post-user p { font-size: 11px; color: var(--text2); }
-  .post-content { font-size: 14px; color: var(--text); line-height: 1.65; }
-  .post-image {
-    margin-top: 10px; border-radius: 10px;
-    background: linear-gradient(135deg, #1a3a5c, #0d6b3a);
-    height: 130px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 50px;
-    position: relative; overflow: hidden;
-  }
-  .post-image-label {
-    position: absolute; bottom: 8px; right: 10px;
-    color: rgba(255,255,255,.7); font-size: 11px;
-  }
-  .post-footer { display: flex; gap: 16px; margin-top: 12px; }
-  .post-action {
-    display: flex; align-items: center; gap: 4px;
-    font-size: 12px; color: var(--text2); cursor: pointer;
-  }
-  .post-action.liked { color: var(--red); }
+    .result-title {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
 
-  /* Battle card */
-  .battle-card {
-    margin: 0 16px;
-    background: var(--white);
-    border-radius: 18px; overflow: hidden;
-    box-shadow: 0 4px 20px rgba(0,0,0,.1);
-    margin-bottom: 16px;
-  }
-  .battle-header {
-    background: linear-gradient(135deg, #1a0808, #3d1515);
-    padding: 14px 16px;
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .battle-title { font-size: 14px; color: #ff8585; font-weight: 900; }
-  .battle-date { font-size: 11px; color: rgba(255,255,255,.5); }
-  .battle-teams {
-    padding: 16px;
-    display: flex; align-items: center;
-  }
-  .battle-team { flex: 1; text-align: center; }
-  .battle-team-icon { font-size: 32px; }
-  .battle-team-name { font-size: 14px; font-weight: 900; margin-top: 6px; }
-  .battle-team-score { font-size: 28px; font-family: 'Oswald', sans-serif; font-weight: 700; color: var(--jade); }
-  .battle-divider { font-size: 18px; color: var(--text2); padding: 0 12px; font-family: 'Oswald', sans-serif; }
-  .battle-bar-wrap { padding: 0 16px 16px; }
-  .battle-bar-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--text2); margin-bottom: 6px; }
-  .battle-bar {
-    height: 8px; border-radius: 4px;
-    background: linear-gradient(to right, var(--red) 0%, var(--red) 62%, var(--jade) 62%, var(--jade) 100%);
-    position: relative;
-  }
-  .battle-bar::after {
-    content: '';
-    position: absolute; top: 50%; left: 62%;
-    transform: translate(-50%, -50%);
-    width: 14px; height: 14px;
-    background: white;
-    border: 2px solid var(--text2);
-    border-radius: 50%;
-  }
+    .pill {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
 
-  /* ══════════════════════════════════
-     PAGE 4 — STATS
-  ══════════════════════════════════ */
-  .stats-hero {
-    background: linear-gradient(145deg, #0a0d1a 0%, #1a1e4a 50%, #2a2e6b 100%);
-    padding: 56px 16px 24px;
-    position: relative; overflow: hidden;
-  }
-  .stats-hero::after {
-    content: '📊';
-    position: absolute; right: 20px; top: 50%;
-    transform: translateY(-50%);
-    font-size: 80px; opacity: .12;
-    pointer-events: none;
-  }
-  .stats-title {
-    font-family: 'ZCOOL XiaoWei', serif;
-    font-size: 26px; color: #a0b4ff;
-    letter-spacing: 3px;
-  }
-  .stats-subtitle { font-size: 13px; color: rgba(255,255,255,.5); margin-top: 5px; }
+    .kv {
+      display: grid;
+      grid-template-columns: 90px 1fr;
+      gap: 8px;
+      font-size: 14px;
+      line-height: 1.7;
+      margin: 4px 0;
+    }
 
-  .player-list { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
-  .player-card {
-    background: var(--white); border-radius: 16px;
-    padding: 14px 16px;
-    display: flex; align-items: center; gap: 14px;
-    box-shadow: 0 2px 12px rgba(0,0,0,.07);
-    cursor: pointer; transition: all .2s;
-    position: relative; overflow: hidden;
-  }
-  .player-card:active { transform: scale(.98); }
-  .player-rank {
-    font-family: 'Oswald', sans-serif;
-    font-size: 22px; font-weight: 700;
-    width: 28px; text-align: center; flex-shrink: 0;
-  }
-  .rank-1 { color: var(--gold); }
-  .rank-2 { color: #aaa; }
-  .rank-3 { color: #cd7f32; }
-  .rank-other { color: var(--text2); font-size: 16px; }
-  .player-avatar {
-    width: 48px; height: 48px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 24px; flex-shrink: 0;
-  }
-  .player-info { flex: 1; }
-  .player-name { font-size: 15px; font-weight: 900; color: var(--ink); }
-  .player-team { font-size: 12px; color: var(--text2); margin-top: 2px; }
-  .player-stats { display: flex; gap: 12px; margin-top: 6px; }
-  .stat-pill {
-    font-size: 11px; padding: 3px 8px;
-    border-radius: 20px; font-weight: 700;
-  }
-  .stat-pill.goals { background: rgba(26,107,74,.12); color: var(--jade); }
-  .stat-pill.assists { background: rgba(232,160,32,.12); color: var(--gold); }
-  .stat-pill.rating { background: rgba(74,74,192,.12); color: #4a4ac0; }
-  .player-score {
-    font-family: 'Oswald', sans-serif;
-    font-size: 26px; font-weight: 700;
-    color: var(--jade); flex-shrink: 0;
-  }
-  .player-card::before {
-    content: '';
-    position: absolute; right: 0; top: 0; bottom: 0;
-    width: 4px;
-  }
-  .player-card.nj::before { background: linear-gradient(to bottom, #1a3a5c, #2a6496); }
-  .player-card.xz::before { background: linear-gradient(to bottom, #8b1a1a, #c0392b); }
-  .player-card.sz::before { background: linear-gradient(to bottom, #3d1a5c, #7b3fa0); }
-  .player-card.cz::before { background: linear-gradient(to bottom, #8b5a0a, #d4a017); }
+    .kv .k { color: #6b7280; }
 
-  /* Team standings */
-  .standings-table { margin: 0 16px 16px; background: var(--white); border-radius: 16px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,.07); }
-  .standings-header {
-    background: linear-gradient(135deg, #0a0d1a, #1a1e4a);
-    padding: 12px 14px;
-    display: grid;
-    grid-template-columns: 24px 1fr 30px 30px 30px 36px;
-    gap: 4px;
-    font-size: 11px; color: rgba(255,255,255,.55);
-    font-weight: 700; letter-spacing: 1px;
-  }
-  .standings-row {
-    padding: 12px 14px;
-    display: grid;
-    grid-template-columns: 24px 1fr 30px 30px 30px 36px;
-    gap: 4px;
-    font-size: 13px; align-items: center;
-    border-bottom: 1px solid rgba(0,0,0,.05);
-    cursor: pointer; transition: background .15s;
-  }
-  .standings-row:last-child { border-bottom: none; }
-  .standings-row:active { background: var(--mist); }
-  .st-pos { font-weight: 700; color: var(--text2); text-align: center; }
-  .st-pos.top { color: var(--jade); }
-  .st-team-wrap { display: flex; align-items: center; gap: 6px; }
-  .st-emoji { font-size: 16px; }
-  .st-name { font-size: 13px; font-weight: 700; color: var(--ink); }
-  .st-num { text-align: center; color: var(--text2); }
-  .st-pts { text-align: center; font-weight: 900; color: var(--jade); }
+    .section-title {
+      margin-top: 16px;
+      margin-bottom: 10px;
+      font-weight: 800;
+      font-size: 16px;
+    }
 
-  /* ── FLOATING TICKET BUTTON ── */
-  .fab {
-    position: fixed; bottom: 90px; right: 20px;
-    width: 52px; height: 52px;
-    background: linear-gradient(135deg, var(--gold), #c8840a);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 22px;
-    box-shadow: 0 4px 20px rgba(232,160,32,.5);
-    cursor: pointer;
-    z-index: 50;
-    animation: fabPulse 2s ease-in-out infinite;
-    transition: all .2s;
-  }
-  .fab:active { transform: scale(.92); }
-  @keyframes fabPulse {
-    0%, 100% { box-shadow: 0 4px 20px rgba(232,160,32,.5); }
-    50% { box-shadow: 0 4px 30px rgba(232,160,32,.8), 0 0 0 8px rgba(232,160,32,.15); }
-  }
+    .section-title.small {
+      margin-top: 0;
+      margin-bottom: 8px;
+      font-size: 15px;
+    }
 
-  /* ── TOAST ── */
-  .toast {
-    position: fixed; top: 60px; left: 50%; transform: translateX(-50%) translateY(-80px);
-    background: var(--ink); color: white;
-    padding: 12px 20px; border-radius: 30px;
-    font-size: 13px; z-index: 9999;
-    transition: transform .35s cubic-bezier(.34,1.56,.64,1);
-    white-space: nowrap;
-    border: 1px solid rgba(45,148,105,.3);
-    max-width: calc(100% - 32px);
-  }
-  .toast.show { transform: translateX(-50%) translateY(0); }
+    .score-box {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
 
-  /* ── TICKET MODAL ── */
-  .modal-overlay {
-    position: fixed; inset: 0; z-index: 200;
-    background: rgba(0,0,0,.7);
-    display: flex; align-items: flex-end;
-    opacity: 0; visibility: hidden;
-    transition: all .3s;
-  }
-  .modal-overlay.show { opacity: 1; visibility: visible; }
-  .modal-sheet {
-    width: 100%; max-width: 420px; margin: 0 auto;
-    background: var(--paper);
-    border-radius: 24px 24px 0 0;
-    padding: 20px 20px calc(30px + env(safe-area-inset-bottom));
-    transform: translateY(100%);
-    transition: transform .35s cubic-bezier(.34,1.2,.64,1);
-  }
-  .modal-overlay.show .modal-sheet { transform: translateY(0); }
-  .modal-handle {
-    width: 40px; height: 4px;
-    background: rgba(0,0,0,.15); border-radius: 2px;
-    margin: 0 auto 20px;
-  }
-  .modal-title { font-size: 18px; font-weight: 900; color: var(--ink); text-align: center; margin-bottom: 20px; }
-  .price-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-  .price-item {
-    background: var(--white); border-radius: 14px;
-    padding: 16px; text-align: center;
-    border: 2px solid transparent;
-    cursor: pointer; transition: all .2s;
-    box-shadow: 0 2px 8px rgba(0,0,0,.06);
-  }
-  .price-item.selected { border-color: var(--jade); background: var(--mist); }
-  .price-item:active { transform: scale(.96); }
-  .price-zone { font-size: 12px; color: var(--text2); margin-bottom: 4px; }
-  .price-value { font-size: 22px; font-family: 'Oswald', sans-serif; font-weight: 700; color: var(--jade); }
-  .price-note { font-size: 10px; color: var(--text2); margin-top: 4px; }
-  .btn-confirm {
-    width: 100%; background: linear-gradient(135deg, var(--jade), var(--jade-light));
-    border: none; border-radius: 14px; padding: 16px;
-    font-family: 'Noto Serif SC', serif; font-size: 16px; font-weight: 700;
-    color: white; cursor: pointer;
-    box-shadow: 0 4px 20px rgba(26,107,74,.35);
-    transition: all .2s;
-    letter-spacing: 1px;
-  }
-  .btn-confirm:active { transform: scale(.97); }
+    .score-item {
+      background: #f8fafc;
+      border-radius: 14px;
+      padding: 12px;
+      text-align: center;
+    }
 
-  /* ── SHARE PREVIEW MODAL ── */
-  .share-overlay {
-    position: fixed; inset: 0; z-index: 500;
-    background: rgba(0,0,0,.7);
-    display: flex; align-items: center; justify-content: center;
-    opacity: 0; visibility: hidden;
-    transition: all .3s ease;
-    backdrop-filter: blur(6px);
-  }
-  .share-overlay.show { opacity: 1; visibility: visible; }
-  .share-preview {
-    width: 320px; border-radius: 20px; overflow: hidden;
-    background: linear-gradient(160deg, #0d1a12, #1a4a28);
-    box-shadow: 0 20px 60px rgba(0,0,0,.5);
-    animation: sharePopIn .4s ease forwards;
-    transform: scale(.8); opacity: 0;
-  }
-  .share-overlay.show .share-preview { transform: scale(1); opacity: 1; }
-  @keyframes sharePopIn { to { transform: scale(1); opacity: 1; } }
-  .share-preview-header {
-    padding: 20px 20px 14px;
-    display: flex; align-items: center; gap: 10px;
-    border-bottom: 1px solid rgba(255,255,255,.1);
-  }
-  .share-preview-avatar {
-    width: 40px; height: 40px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--jade), var(--gold));
-    display: flex; align-items: center; justify-content: center;
-    font-size: 20px;
-  }
-  .share-preview-user { color: rgba(255,255,255,.9); font-size: 14px; font-weight: 700; }
-  .share-preview-time { color: rgba(255,255,255,.4); font-size: 11px; margin-top: 2px; }
-  .share-preview-body {
-    padding: 16px 20px;
-    color: rgba(255,255,255,.85);
-    font-size: 14px; line-height: 1.8;
-  }
-  .share-preview-footer {
-    padding: 14px 20px;
-    background: rgba(0,0,0,.2);
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .share-preview-brand {
-    font-family: 'ZCOOL XiaoWei', serif;
-    font-size: 16px; color: var(--gold);
-    letter-spacing: 2px;
-  }
-  .share-preview-qr {
-    width: 42px; height: 42px;
-    background: white; border-radius: 6px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 10px; color: var(--ink); text-align: center;
-    line-height: 1.2; font-weight: 700;
-  }
-  .share-actions {
-    display: flex; gap: 12px; margin-top: 20px; justify-content: center;
-  }
-  .share-action-btn {
-    display: flex; flex-direction: column; align-items: center; gap: 6px;
-    cursor: pointer;
-  }
-  .share-action-icon {
-    width: 50px; height: 50px; border-radius: 50%;
-    background: rgba(255,255,255,.12);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 22px; transition: all .2s;
-  }
-  .share-action-icon:active { transform: scale(.9); background: rgba(255,255,255,.2); }
-  .share-action-label { font-size: 11px; color: rgba(255,255,255,.6); }
-  .share-close-btn {
-    margin-top: 20px; background: none; border: 1px solid rgba(255,255,255,.3);
-    color: rgba(255,255,255,.7); padding: 10px 36px; border-radius: 30px;
-    font-family: 'Noto Serif SC', serif; font-size: 14px; cursor: pointer;
-    transition: all .2s;
-  }
-  .share-close-btn:active { background: rgba(255,255,255,.1); }
+    .score-item .num {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
 
-  /* ── ROUTE DETAIL MODAL ── */
-  .route-overlay {
-    position: fixed; inset: 0; z-index: 500;
-    background: rgba(0,0,0,.6);
-    display: flex; align-items: flex-end; justify-content: center;
-    opacity: 0; visibility: hidden;
-    transition: all .3s ease;
-  }
-  .route-overlay.show { opacity: 1; visibility: visible; }
-  .route-detail-sheet {
-    width: 100%; max-width: 420px;
-    background: var(--paper);
-    border-radius: 24px 24px 0 0;
-    max-height: 85vh; overflow-y: auto;
-    transform: translateY(100%);
-    transition: transform .4s cubic-bezier(.16,1,.3,1);
-  }
-  .route-overlay.show .route-detail-sheet { transform: translateY(0); }
-  .route-detail-header {
-    padding: 20px;
-    background: linear-gradient(160deg, var(--ink), #1a4a28);
-    border-radius: 24px 24px 0 0;
-    position: relative;
-  }
-  .route-detail-close {
-    position: absolute; top: 16px; right: 16px;
-    width: 32px; height: 32px; border-radius: 50%;
-    background: rgba(255,255,255,.15); border: none;
-    color: white; font-size: 18px; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .route-detail-city {
-    font-family: 'ZCOOL XiaoWei', serif;
-    font-size: 28px; color: var(--gold); letter-spacing: 3px;
-  }
-  .route-detail-name {
-    font-size: 15px; color: rgba(255,255,255,.7); margin-top: 4px;
-  }
-  .route-detail-date {
-    display: inline-flex; align-items: center; gap: 5px;
-    background: rgba(232,160,32,.15); border: 1px solid rgba(232,160,32,.4);
-    border-radius: 20px; padding: 4px 12px;
-    font-size: 12px; color: var(--gold-light); margin-top: 12px;
-  }
-  .route-timeline { padding: 20px; }
-  .route-timeline-title {
-    font-size: 16px; font-weight: 900; color: var(--ink);
-    margin-bottom: 16px;
-    display: flex; align-items: center; gap: 6px;
-  }
-  .route-timeline-title::before {
-    content: ''; width: 4px; height: 18px;
-    background: linear-gradient(to bottom, var(--gold), var(--jade));
-    border-radius: 2px;
-  }
-  .timeline-item {
-    display: flex; gap: 14px; position: relative;
-    padding-bottom: 20px;
-  }
-  .timeline-item:last-child { padding-bottom: 0; }
-  .timeline-item::before {
-    content: ''; position: absolute;
-    left: 15px; top: 32px; bottom: 0;
-    width: 2px; background: var(--mist);
-  }
-  .timeline-item:last-child::before { display: none; }
-  .timeline-dot {
-    width: 32px; height: 32px; border-radius: 50%;
-    background: var(--mist); flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px; z-index: 1;
-  }
-  .timeline-content { flex: 1; }
-  .timeline-time {
-    font-size: 11px; color: var(--text2); font-weight: 700;
-  }
-  .timeline-place {
-    font-size: 14px; font-weight: 700; color: var(--ink); margin-top: 2px;
-  }
-  .timeline-desc {
-    font-size: 12px; color: var(--text2); margin-top: 3px; line-height: 1.5;
-  }
-  .route-detail-tags {
-    display: flex; flex-wrap: wrap; gap: 8px;
-    padding: 0 20px 16px;
-  }
-  .route-detail-actions {
-    padding: 16px 20px 30px;
-    display: flex; gap: 10px;
-  }
-  .route-detail-actions button {
-    flex: 1; padding: 14px; border-radius: 14px;
-    font-family: 'Noto Serif SC', serif; font-size: 14px; font-weight: 700;
-    cursor: pointer; transition: all .2s; border: none;
-  }
-  .route-detail-actions button:active { transform: scale(.97); }
-  .btn-add-trip {
-    background: linear-gradient(135deg, var(--jade), var(--jade-light));
-    color: white; box-shadow: 0 4px 16px rgba(26,107,74,.3);
-  }
-  .btn-share-route {
-    background: rgba(232,160,32,.12); border: 1px solid rgba(232,160,32,.4) !important;
-    color: var(--gold);
-  }
+    .muted { color: #6b7280; }
 
-  /* Entrance animations */
-  .fade-up {
-    opacity: 0; transform: translateY(20px);
-    animation: fadeUp .5s ease forwards;
-  }
-  @keyframes fadeUp {
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .fade-up:nth-child(1) { animation-delay: .1s; }
-  .fade-up:nth-child(2) { animation-delay: .2s; }
-  .fade-up:nth-child(3) { animation-delay: .3s; }
-  .fade-up:nth-child(4) { animation-delay: .4s; }
+    ul {
+      padding-left: 18px;
+      margin: 8px 0;
+    }
 
-  /* Share card */
-  .share-section { padding: 16px; }
-  .share-card {
-    background: linear-gradient(135deg, #0d1a12, #1a4a28);
-    border-radius: 18px; padding: 20px;
-    position: relative; overflow: hidden;
-  }
-  .share-card::before {
-    content: '';
-    position: absolute; top: -40px; right: -40px;
-    width: 120px; height: 120px;
-    background: rgba(232,160,32,.1);
-    border-radius: 50%;
-  }
-  .share-match { font-size: 16px; font-weight: 900; color: white; }
-  .share-score {
-    font-family: 'Oswald', sans-serif;
-    font-size: 42px; font-weight: 700;
-    color: var(--gold); line-height: 1.1; margin: 8px 0;
-  }
-  .share-desc { font-size: 12px; color: rgba(255,255,255,.55); }
-  .share-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; }
-  .share-brand {
-    font-family: 'ZCOOL XiaoWei', serif;
-    font-size: 14px; color: var(--gold-light);
-    letter-spacing: 2px;
-  }
-  .share-btn {
-    background: var(--gold); color: var(--ink);
-    border: none; border-radius: 20px; padding: 8px 16px;
-    font-size: 12px; font-weight: 700; cursor: pointer;
-    font-family: 'Noto Serif SC', serif;
-    transition: all .2s;
-  }
-  .share-btn:active { transform: scale(.95); }
+    li { margin-bottom: 8px; }
 
-  /* Progress bar for stats */
-  .stat-bars { padding: 0 16px 20px; }
-  .stat-bar-item { margin-bottom: 14px; }
-  .stat-bar-head { display: flex; justify-content: space-between; font-size: 12px; color: var(--text2); margin-bottom: 6px; }
-  .stat-bar-track { height: 6px; background: var(--mist); border-radius: 3px; overflow: hidden; }
-  .stat-bar-fill { height: 100%; border-radius: 3px; transition: width 1s ease; }
-  .fill-jade { background: linear-gradient(90deg, var(--jade), var(--jade-light)); }
-  .fill-gold { background: linear-gradient(90deg, #c8840a, var(--gold)); }
-  .fill-blue { background: linear-gradient(90deg, #1a3a8b, #4a6ade); }
+    .small {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 8px;
+      line-height: 1.6;
+      word-break: break-all;
+    }
 
-  /* ── COMMENT SYSTEM ── */
-  .post-comment-btn {
-    display: flex; align-items: center; gap: 5px;
-    font-size: 12px; color: var(--jade); cursor: pointer;
-    font-weight: 700;
-  }
-  .comments-section {
-    margin-top: 12px;
-    border-top: 1px solid rgba(0,0,0,.06);
-    padding-top: 10px;
-    display: none;
-  }
-  .comments-section.open { display: block; }
-  .comment-item {
-    display: flex; gap: 8px; margin-bottom: 10px;
-  }
-  .comment-avatar {
-    width: 28px; height: 28px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 13px; flex-shrink: 0;
-    background: var(--mist);
-  }
-  .comment-bubble {
-    background: var(--mist); border-radius: 0 10px 10px 10px;
-    padding: 8px 10px; flex: 1;
-  }
-  .comment-user { font-size: 11px; font-weight: 700; color: var(--jade); margin-bottom: 3px; }
-  .comment-text { font-size: 12px; color: var(--text); line-height: 1.5; }
-  .comment-time { font-size: 10px; color: var(--text2); margin-top: 3px; }
-  .comment-input-row {
-    display: flex; gap: 8px; align-items: center; margin-top: 10px;
-  }
-  .comment-input {
-    flex: 1; background: var(--mist); border: 1px solid rgba(0,0,0,.08);
-    border-radius: 20px; padding: 9px 14px;
-    font-family: 'Noto Serif SC', serif; font-size: 13px; color: var(--ink);
-    outline: none; transition: border-color .2s;
-  }
-  .comment-input:focus { border-color: var(--jade); }
-  .comment-send {
-    width: 36px; height: 36px; border-radius: 50%;
-    background: var(--jade); border: none;
-    color: white; font-size: 16px; cursor: pointer;
-    flex-shrink: 0; transition: all .2s;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .comment-send:active { transform: scale(.9); background: var(--jade-light); }
+    .poi-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 14px;
+    }
 
-  /* ── POST COMPOSER MODAL ── */
-  .compose-overlay {
-    position: fixed; inset: 0; z-index: 300;
-    background: rgba(0,0,0,.75);
-    display: flex; align-items: flex-end;
-    opacity: 0; visibility: hidden;
-    transition: all .3s;
-  }
-  .compose-overlay.show { opacity: 1; visibility: visible; }
-  .compose-sheet {
-    width: 100%; max-width: 420px; margin: 0 auto;
-    background: var(--paper);
-    border-radius: 24px 24px 0 0;
-    padding: 20px 20px calc(30px + env(safe-area-inset-bottom));
-    transform: translateY(100%);
-    transition: transform .35s cubic-bezier(.34,1.2,.64,1);
-  }
-  .compose-overlay.show .compose-sheet { transform: translateY(0); }
-  .compose-header {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 16px;
-  }
-  .compose-title { font-size: 17px; font-weight: 900; color: var(--ink); }
-  .compose-close {
-    width: 32px; height: 32px; border-radius: 50%;
-    background: rgba(0,0,0,.08); border: none;
-    font-size: 16px; cursor: pointer; color: var(--text2);
-    display: flex; align-items: center; justify-content: center;
-  }
-  .compose-city-select {
-    display: flex; gap: 8px; overflow-x: auto;
-    padding-bottom: 8px; scrollbar-width: none; margin-bottom: 14px;
-  }
-  .compose-city-select::-webkit-scrollbar { display: none; }
-  .compose-city-btn {
-    flex: 0 0 auto; padding: 7px 13px;
-    border-radius: 20px; border: 1.5px solid rgba(0,0,0,.1);
-    font-size: 12px; cursor: pointer; background: var(--white);
-    color: var(--text2); font-family: 'Noto Serif SC', serif;
-    transition: all .2s; white-space: nowrap;
-  }
-  .compose-city-btn.active {
-    background: var(--jade); color: white; border-color: var(--jade);
-    font-weight: 700;
-  }
-  .compose-textarea {
-    width: 100%; min-height: 120px;
-    background: var(--mist); border: 1px solid rgba(0,0,0,.08);
-    border-radius: 14px; padding: 14px;
-    font-family: 'Noto Serif SC', serif; font-size: 14px; color: var(--ink);
-    outline: none; resize: none; line-height: 1.7;
-    transition: border-color .2s;
-  }
-  .compose-textarea:focus { border-color: var(--jade); }
-  .compose-toolbar {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-top: 12px;
-  }
-  .compose-tools { display: flex; gap: 10px; }
-  .compose-tool-btn {
-    padding: 8px 12px; border-radius: 10px;
-    background: var(--mist); border: none;
-    font-size: 14px; cursor: pointer; transition: all .2s;
-  }
-  .compose-tool-btn:active { transform: scale(.9); }
-  .compose-charcount { font-size: 12px; color: var(--text2); }
-  .compose-charcount.warn { color: var(--red); }
-  .btn-post {
-    width: 100%; margin-top: 14px;
-    background: linear-gradient(135deg, var(--jade), var(--jade-light));
-    border: none; border-radius: 14px; padding: 15px;
-    font-family: 'Noto Serif SC', serif; font-size: 15px; font-weight: 700;
-    color: white; cursor: pointer;
-    box-shadow: 0 4px 16px rgba(26,107,74,.3);
-    transition: all .2s; letter-spacing: 1px;
-  }
-  .btn-post:active { transform: scale(.97); }
-  .btn-post:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+    .poi-panel {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      padding: 12px;
+    }
 
-  /* New post indicator */
-  .new-post-badge {
-    display: inline-block;
-    background: var(--red); color: white;
-    font-size: 10px; padding: 2px 6px; border-radius: 10px;
-    margin-left: 6px; font-weight: 700;
-    animation: pulse 1s ease infinite alternate;
-  }
-  @keyframes pulse { from { opacity: 1; } to { opacity: .6; } }
-</style>
+    @media (max-width: 960px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      #map {
+        height: 420px;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .poi-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
+  <div class="wrap">
+    <h1>苏超看球助手 MVP</h1>
+    <div class="sub">
+      输入你支持的球队和出发地。系统会优先在该球队参与的比赛中推荐一场最适合去看的比赛，并展示驾车路线、附近餐饮和附近景点。
+    </div>
 
-<!-- SPLASH -->
-<div id="splash">
-  <div class="splash-ball"></div>
-  <div class="splash-title">城超通</div>
-  <div class="splash-sub">苏超球迷文旅智能平台</div>
-  <div class="splash-loader"><div class="splash-loader-bar"></div></div>
-</div>
+    <div class="grid">
+      <div class="card">
+        <label for="team">支持的球队</label>
+        <select id="team">
+          <option value="南京队">南京队</option>
+          <option value="苏州队">苏州队</option>
+          <option value="无锡队">无锡队</option>
+          <option value="常州队">常州队</option>
+          <option value="南通队">南通队</option>
+          <option value="徐州队">徐州队</option>
+          <option value="扬州队">扬州队</option>
+          <option value="镇江队">镇江队</option>
+          <option value="盐城队">盐城队</option>
+        </select>
 
-<!-- APP -->
-<div id="app">
+        <label for="origin">你的出发地</label>
+        <input id="origin" type="text" placeholder="例如：苏州站 / 南京南站 / 无锡市政府" />
 
-  <!-- ══ PAGE: HOME ══ -->
-  <div class="page active" id="page-home">
-    <div class="home-hero">
-      <div class="home-topbar">
-        <div class="home-logo">城<span>超</span>通</div>
-        <div class="home-notif" onclick="showToast('📬 你有3条新消息')">🔔<div class="notif-dot"></div></div>
+        <button id="recommendBtn">开始推荐</button>
+
+        <div class="status info" id="infoBox"></div>
+        <div class="status error" id="errorBox"></div>
+
+        
       </div>
 
-      <!-- Next match -->
-      <div class="next-match fade-up">
-        <div class="match-badge">最近赛事 · 第8轮</div>
-        <div class="match-teams">
-          <div class="team-block">
-            <div class="team-emoji">🏰</div>
-            <div class="team-name">南京FC</div>
-            <div class="team-city">六朝古都</div>
+      <div>
+        <div class="card" style="margin-bottom: 20px;">
+          <div id="resultEmpty" class="muted">
+            还没有结果。点击“开始推荐”后，这里会显示推荐比赛、路线、附近餐饮和景点。
           </div>
-          <div class="match-vs">
-            <div class="vs-text">VS</div>
-            <div class="match-time">03/15 19:30</div>
-          </div>
-          <div class="team-block">
-            <div class="team-emoji">🌊</div>
-            <div class="team-name">苏州FC</div>
-            <div class="team-city">姑苏城外</div>
-          </div>
-        </div>
-        <div class="match-actions">
-          <button class="btn-ticket" onclick="openTicketModal()">🎫 立即抢票</button>
-          <button class="btn-route" onclick="switchPage('tour'); openRouteDetail('nj')">🗺️ 球迷路线</button>
-        </div>
-      </div>
-    </div>
 
-    <!-- City filter -->
-    <div class="section-title">
-      <h3>球队城市</h3>
-      <span class="section-more">全部 →</span>
-    </div>
-    <div class="cities-scroll">
-      <div class="city-chip active" onclick="filterCity(this)">
-        <div class="city-emoji">🏰</div>
-        <div class="city-name">南京</div>
-        <div class="city-team">南京FC</div>
-      </div>
-      <div class="city-chip" onclick="filterCity(this)">
-        <div class="city-emoji">🌸</div>
-        <div class="city-name">苏州</div>
-        <div class="city-team">苏州FC</div>
-      </div>
-      <div class="city-chip" onclick="filterCity(this)">
-        <div class="city-emoji">🦕</div>
-        <div class="city-name">徐州</div>
-        <div class="city-team">徐州FC</div>
-      </div>
-      <div class="city-chip" onclick="filterCity(this)">
-        <div class="city-emoji">🌊</div>
-        <div class="city-name">宿迁</div>
-        <div class="city-team">宿迁FC</div>
-      </div>
-      <div class="city-chip" onclick="filterCity(this)">
-        <div class="city-emoji">🥕</div>
-        <div class="city-name">常州</div>
-        <div class="city-team">常州FC</div>
-      </div>
-      <div class="city-chip" onclick="filterCity(this)">
-        <div class="city-emoji">🦩</div>
-        <div class="city-name">盐城</div>
-        <div class="city-team">盐城FC</div>
-      </div>
-    </div>
+          <div id="resultContent" style="display:none;">
+            <div class="pill">推荐结果</div>
+            <div class="result-title" id="matchTitle"></div>
 
-    <!-- Schedule -->
-    <div class="section-title">
-      <h3>近期赛程</h3>
-      <span class="section-more">更多 →</span>
-    </div>
-    <div class="schedule-list">
-      <div class="schedule-card fade-up" onclick="showToast('🎫 徐州 vs 宿迁 · 楚汉争霸!')">
-        <div class="sch-left">
-          <div class="sch-teams">🦕 徐州 vs 宿迁 🌊</div>
-          <div class="sch-meta">📍 徐州奥体中心 · 第7轮</div>
+            <div class="kv"><div class="k">比赛时间</div><div id="matchDate"></div></div>
+            <div class="kv"><div class="k">球场</div><div id="venueName"></div></div>
+            <div class="kv"><div class="k">球场地址</div><div id="venueAddress"></div></div>
+            <div class="kv"><div class="k">推荐理由</div><div id="reason"></div></div>
+
+            <div class="score-box">
+              <div class="score-item">
+                <div class="num" id="travelTime">--</div>
+                <div class="muted">预计耗时</div>
+              </div>
+              <div class="score-item">
+                <div class="num" id="travelDistance">--</div>
+                <div class="muted">预计距离</div>
+              </div>
+              <div class="score-item">
+                <div class="num" id="matchScore">--</div>
+                <div class="muted">推荐分</div>
+              </div>
+            </div>
+
+            <div class="poi-grid">
+              <div class="poi-panel">
+                <div class="section-title small">附近 3 家餐饮</div>
+                <ul id="restaurantList"></ul>
+              </div>
+
+              <div class="poi-panel">
+                <div class="section-title small">附近 3 处景点</div>
+                <ul id="spotList"></ul>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="sch-right">
-          <div class="sch-date">03/13</div>
-          <div class="sch-status hot">🔥 热卖</div>
-        </div>
-      </div>
-      <div class="schedule-card fade-up" onclick="openTicketModal()">
-        <div class="sch-left">
-          <div class="sch-teams">🏰 南京 vs 苏州 🌸</div>
-          <div class="sch-meta">📍 南京奥林匹克中心 · 第8轮</div>
-        </div>
-        <div class="sch-right">
-          <div class="sch-date">03/15</div>
-          <div class="sch-status soon">⏰ 即将开票</div>
-        </div>
-      </div>
-      <div class="schedule-card fade-up" onclick="showToast('📅 已加入提醒')">
-        <div class="sch-left">
-          <div class="sch-teams">🥕 常州 vs 盐城 🦩</div>
-          <div class="sch-meta">📍 常州市体育中心 · 第8轮</div>
-        </div>
-        <div class="sch-right">
-          <div class="sch-date">03/16</div>
-          <div class="sch-status ok">✅ 有票</div>
+
+        <div class="card">
+          <div id="map"></div>
+
+          <div class="map-legend">
+            <span class="legend-item">
+              <span class="legend-dot food"></span>餐饮
+            </span>
+            <span class="legend-item">
+              <span class="legend-dot spot"></span>景点
+            </span>
+          </div>
+
+          <div class="small" id="debugBox"></div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ══ PAGE: TOUR ══ -->
-  <div class="page" id="page-tour">
-    <div class="tour-hero">
-      <div class="tour-title">跟着苏超去旅行</div>
-      <div class="tour-subtitle">赛事 × 美食 × 文化 · 一键生成专属路线</div>
-      <div class="tour-tabs">
-        <div class="tour-tab active" onclick="switchTourTab(this,'routes')">球迷路线</div>
-        <div class="tour-tab" onclick="switchTourTab(this,'special')">城市特产</div>
-      </div>
-    </div>
+  <script>
+    const AMAP_KEY = '07eede2236d2aa14e532fb06da994d23';
+    const AMAP_SECURITY_JS_CODE = '8082de79b33504459b6317cec193d823';
 
-    <div id="tour-routes">
-      <div class="route-cards">
-        <div class="route-card fade-up" onclick="openRouteDetail('nj')">
-          <div class="route-img nj">
-            <span>🏰</span>
-            <div class="route-img-overlay"></div>
-            <div class="route-img-text">南京 · 六朝古都</div>
-            <div class="route-img-badge">3月15日</div>
-          </div>
-          <div class="route-body">
-            <div class="route-name">金陵球迷一日游</div>
-            <div class="route-desc">赛前打卡中山陵 → 秦淮夫子庙小吃 → 南京奥体观战 → 赛后新街口夜市 → 带走盐水鸭</div>
-            <div class="route-tags">
-              <span class="route-tag food">🦆 盐水鸭</span>
-              <span class="route-tag scene">🏛️ 中山陵</span>
-              <span class="route-tag night">🌙 夫子庙</span>
-            </div>
-          </div>
-        </div>
-        <div class="route-card fade-up" onclick="openRouteDetail('sz')">
-          <div class="route-img sz">
-            <span>🌸</span>
-            <div class="route-img-overlay"></div>
-            <div class="route-img-text">苏州 · 园林水城</div>
-            <div class="route-img-badge">3月22日</div>
-          </div>
-          <div class="route-body">
-            <div class="route-name">苏城球迷精华游</div>
-            <div class="route-desc">上午拙政园漫步 → 午餐苏帮菜 → 苏州体育中心看球 → 阳澄湖大闸蟹晚宴</div>
-            <div class="route-tags">
-              <span class="route-tag food">🦀 大闸蟹</span>
-              <span class="route-tag scene">🌿 拙政园</span>
-              <span class="route-tag night">🍜 苏帮菜</span>
-            </div>
-          </div>
-        </div>
-        <div class="route-card fade-up" onclick="openRouteDetail('cz')">
-          <div class="route-img cz">
-            <span>🥕</span>
-            <div class="route-img-overlay"></div>
-            <div class="route-img-text">常州 · 龙城</div>
-            <div class="route-img-badge">3月16日</div>
-          </div>
-          <div class="route-body">
-            <div class="route-name">龙城萝卜干球迷行</div>
-            <div class="route-desc">恐龙园开黑 → 常州老街逛吃 → 体育中心决战 → 人手一罐萝卜干带回家</div>
-            <div class="route-tags">
-              <span class="route-tag food">🥕 萝卜干</span>
-              <span class="route-tag scene">🦕 恐龙园</span>
-              <span class="route-tag night">🍺 老街夜市</span>
-            </div>
-          </div>
-        </div>
-        <div class="route-card fade-up" onclick="openRouteDetail('yc')">
-          <div class="route-img yc">
-            <span>🦩</span>
-            <div class="route-img-overlay"></div>
-            <div class="route-img-text">盐城 · 鹤乡</div>
-            <div class="route-img-badge">3月23日</div>
-          </div>
-          <div class="route-body">
-            <div class="route-name">鹤乡海鲜球迷游</div>
-            <div class="route-desc">麋鹿自然保护区 → 盐城新四军纪念馆 → 球场助威 → 赛后海鲜烧烤趴</div>
-            <div class="route-tags">
-              <span class="route-tag food">🦞 盐城海鲜</span>
-              <span class="route-tag scene">🦌 麋鹿苑</span>
-              <span class="route-tag night">🔥 海鲜烧烤</span>
-            </div>
-          </div>
-        </div>
-        <div class="route-card" onclick="openRouteDetail('xz')">
-          <div class="route-img xz">
-            <span>🦕</span>
-            <div class="route-img-overlay"></div>
-            <div class="route-img-text">徐州 · 楚汉故里</div>
-            <div class="route-img-badge">3月13日</div>
-          </div>
-          <div class="route-body">
-            <div class="route-name">彭城铁军球迷行</div>
-            <div class="route-desc">汉文化景区 → 云龙湖骑行 → 徐州奥体楚汉决战 → 赛后把子肉 + 烙馍卷菜</div>
-            <div class="route-tags">
-              <span class="route-tag food">🥩 把子肉</span>
-              <span class="route-tag scene">🏛️ 汉文化景区</span>
-              <span class="route-tag night">🌊 云龙湖夜游</span>
-            </div>
-          </div>
-        </div>
-        <div class="route-card" onclick="openRouteDetail('sq')">
-          <div class="route-img sq">
-            <span>👑</span>
-            <div class="route-img-overlay"></div>
-            <div class="route-img-text">宿迁 · 项羽故里</div>
-            <div class="route-img-badge">3月13日</div>
-          </div>
-          <div class="route-body">
-            <div class="route-name">西楚霸王球迷游</div>
-            <div class="route-desc">项王故里祭拜 → 骆马湖鲜鱼早饭 → 宿迁体育场助威 → 洪泽湖螃蟹晚宴</div>
-            <div class="route-tags">
-              <span class="route-tag food">🦀 洪泽湖螃蟹</span>
-              <span class="route-tag scene">⚔️ 项王故里</span>
-              <span class="route-tag night">🐟 骆马湖鱼宴</span>
-            </div>
-          </div>
-        </div>
-        <div class="route-card" onclick="openRouteDetail('yz')">
-          <div class="route-img yz">
-            <span>🚣</span>
-            <div class="route-img-overlay"></div>
-            <div class="route-img-text">扬州 · 淮扬名城</div>
-            <div class="route-img-badge">3月20日</div>
-          </div>
-          <div class="route-body">
-            <div class="route-name">扬州早茶球迷慢游</div>
-            <div class="route-desc">清晨富春茶社早茶 → 瘦西湖泛舟 → 扬州体育馆观战 → 赛后淮扬菜宴席</div>
-            <div class="route-tags">
-              <span class="route-tag food">🍚 扬州炒饭</span>
-              <span class="route-tag scene">🌸 瘦西湖</span>
-              <span class="route-tag night">🍵 富春早茶</span>
-            </div>
-          </div>
-        </div>
-        <div class="route-card" onclick="openRouteDetail('zj')">
-          <div class="route-img zj">
-            <span>🌉</span>
-            <div class="route-img-overlay"></div>
-            <div class="route-img-text">镇江 · 江南醋都</div>
-            <div class="route-img-badge">3月21日</div>
-          </div>
-          <div class="route-body">
-            <div class="route-name">醋都球迷探秘游</div>
-            <div class="route-desc">金山寺祈福 → 北固山怀古 → 镇江体育场助威 → 赛后锅盖面 + 恒顺香醋带回家</div>
-            <div class="route-tags">
-              <span class="route-tag food">🍶 恒顺香醋</span>
-              <span class="route-tag scene">⛩️ 金山寺</span>
-              <span class="route-tag night">🍜 锅盖面</span>
-            </div>
-          </div>
-        </div>
-        <div class="route-card" onclick="openRouteDetail('ha')">
-          <div class="route-img ha">
-            <span>🌾</span>
-            <div class="route-img-overlay"></div>
-            <div class="route-img-text">淮安 · 总理故里</div>
-            <div class="route-img-badge">3月27日</div>
-          </div>
-          <div class="route-body">
-            <div class="route-name">淮安运河球迷探访</div>
-            <div class="route-desc">周恩来故居参观 → 里运河文化长廊 → 淮安体育馆观战 → 软兜长鱼 + 钦工肉圆晚宴</div>
-            <div class="route-tags">
-              <span class="route-tag food">🐟 软兜长鱼</span>
-              <span class="route-tag scene">🏛️ 总理故居</span>
-              <span class="route-tag night">🚢 里运河夜游</span>
-            </div>
-          </div>
-        </div>
-        <div class="route-card" onclick="openRouteDetail('lyg')">
-          <div class="route-img lyg">
-            <span>🐒</span>
-            <div class="route-img-overlay"></div>
-            <div class="route-img-text">连云港 · 西游圣地</div>
-            <div class="route-img-badge">3月28日</div>
-          </div>
-          <div class="route-body">
-            <div class="route-name">花果山球迷奇遇记</div>
-            <div class="route-desc">花果山登顶打卡 → 连云港渔人码头 → 连云港体育中心观战 → 赛后海鲜大排档</div>
-            <div class="route-tags">
-              <span class="route-tag food">🦑 花果山海鲜</span>
-              <span class="route-tag scene">🐒 花果山</span>
-              <span class="route-tag night">🌊 渔人码头</span>
-            </div>
-          </div>
-        </div>
-        <div class="route-card" onclick="openRouteDetail('wx')">
-          <div class="route-img wx">
-            <span>🌅</span>
-            <div class="route-img-overlay"></div>
-            <div class="route-img-text">无锡 · 太湖明珠</div>
-            <div class="route-img-badge">3月29日</div>
-          </div>
-          <div class="route-body">
-            <div class="route-name">太湖边球迷休闲游</div>
-            <div class="route-desc">鼋头渚赏樱 → 惠山古镇泥人街 → 无锡体育馆助威 → 太湖三白（白鱼/白虾/银鱼）晚宴</div>
-            <div class="route-tags">
-              <span class="route-tag food">🐟 太湖三白</span>
-              <span class="route-tag scene">🌸 鼋头渚</span>
-              <span class="route-tag night">🎭 惠山古镇</span>
-            </div>
-          </div>
-        </div>
-        <div class="route-card" onclick="openRouteDetail('tz')">
-          <div class="route-img tz">
-            <span>🌿</span>
-            <div class="route-img-overlay"></div>
-            <div class="route-img-text">泰州 · 水城慢游</div>
-            <div class="route-img-badge">4月5日</div>
-          </div>
-          <div class="route-body">
-            <div class="route-name">泰州慢城球迷游</div>
-            <div class="route-desc">溱湖湿地公园 → 泰州老街逛吃 → 泰州体育中心看球 → 蟹黄汤包 + 干丝早茶</div>
-            <div class="route-tags">
-              <span class="route-tag food">🥟 蟹黄汤包</span>
-              <span class="route-tag scene">🌿 溱湖湿地</span>
-              <span class="route-tag night">🍵 泰州早茶</span>
-            </div>
-          </div>
-        </div>
-        <div class="route-card" onclick="openRouteDetail('nt')">
-          <div class="route-img nt">
-            <span>⛵</span>
-            <div class="route-img-overlay"></div>
-            <div class="route-img-text">南通 · 江海之城</div>
-            <div class="route-img-badge">4月6日</div>
-          </div>
-          <div class="route-body">
-            <div class="route-name">江海南通球迷探访</div>
-            <div class="route-desc">狼山风景区登高 → 南通博物苑（中国第一座博物馆）→ 南通体育中心观战 → 海鲜蒸蟹 + 文蛤夜宵</div>
-            <div class="route-tags">
-              <span class="route-tag food">🦀 文蛤海鲜</span>
-              <span class="route-tag scene">⛰️ 狼山</span>
-              <span class="route-tag night">🏛️ 博物苑</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    const matches = [
+      {
+        id: 1,
+        home: '南京队',
+        away: '苏州队',
+        date: '2026-05-10 19:30',
+        venue: '南京奥体中心体育场',
+        address: '南京市建邺区江东中路222号',
+        lnglat: [118.725272, 32.004202],
+        heat: 92
+      },
+      {
+        id: 2,
+        home: '无锡队',
+        away: '常州队',
+        date: '2026-05-12 19:30',
+        venue: '无锡体育中心体育场',
+        address: '无锡市滨湖区太湖西大道1500号',
+        lnglat: [120.27062, 31.55088],
+        heat: 80
+      },
+      {
+        id: 3,
+        home: '南通队',
+        away: '徐州队',
+        date: '2026-05-15 19:30',
+        venue: '南通足球训练中心海门基地',
+        address: '南通市海门区广州路1000号',
+        lnglat: [121.13663, 31.89658],
+        heat: 76
+      },
+      {
+        id: 4,
+        home: '扬州队',
+        away: '镇江队',
+        date: '2026-05-18 19:30',
+        venue: '扬州体育公园体育场',
+        address: '扬州市邗江区文昌西路476号',
+        lnglat: [119.36342, 32.40053],
+        heat: 74
+      },
+      {
+        id: 5,
+        home: '苏州队',
+        away: '无锡队',
+        date: '2026-05-22 19:30',
+        venue: '苏州市体育中心体育场',
+        address: '苏州市姑苏区三香路183号',
+        lnglat: [120.585316, 31.302804],
+        heat: 88
+      },
+      {
+        id: 6,
+        home: '盐城队',
+        away: '南京队',
+        date: '2026-05-25 19:30',
+        venue: '盐城奥体中心体育场',
+        address: '盐城奥体中心体育场',
+        heat: 82
+      }
+    ];
 
-    <div id="tour-special" style="display:none;">
-      <div class="specialty-section">
-        <div class="section-title" style="padding-top:16px;padding-left:0;">
-          <h3>城市特产梗地图</h3>
-        </div>
-        <div class="specialty-grid">
-          <div class="specialty-item fade-up" onclick="showToast('🦆 南京盐水鸭，绝了!')">
-            <div class="spec-emoji">🦆</div>
-            <div class="spec-name">盐水鸭</div>
-            <div class="spec-city">南京</div>
-            <div class="spec-meme">"鸭都"不是吹的</div>
-          </div>
-          <div class="specialty-item fade-up" onclick="showToast('🦀 阳澄湖大闸蟹，正宗!')">
-            <div class="spec-emoji">🦀</div>
-            <div class="spec-name">大闸蟹</div>
-            <div class="spec-city">苏州</div>
-            <div class="spec-meme">阳澄湖里洗个澡</div>
-          </div>
-          <div class="specialty-item fade-up" onclick="showToast('🥕 常州萝卜干，下饭神器!')">
-            <div class="spec-emoji">🥕</div>
-            <div class="spec-name">萝卜干</div>
-            <div class="spec-city">常州</div>
-            <div class="spec-meme">进球了就发萝卜干</div>
-          </div>
-          <div class="specialty-item fade-up" onclick="showToast('🦞 盐城海鲜，海的味道!')">
-            <div class="spec-emoji">🦞</div>
-            <div class="spec-name">龙虾蟹贝</div>
-            <div class="spec-city">盐城</div>
-            <div class="spec-meme">海边球场最配海鲜</div>
-          </div>
-          <div class="specialty-item fade-up" onclick="showToast('🧆 扬州炒饭，世界闻名!')">
-            <div class="spec-emoji">🍚</div>
-            <div class="spec-name">扬州炒饭</div>
-            <div class="spec-city">扬州</div>
-            <div class="spec-meme">早茶 + 炒饭 = 人生</div>
-          </div>
-          <div class="specialty-item fade-up" onclick="showToast('🥟 淮安软兜长鱼，鲜!')">
-            <div class="spec-emoji">🐟</div>
-            <div class="spec-name">软兜长鱼</div>
-            <div class="spec-city">淮安</div>
-            <div class="spec-meme">总理家乡菜</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+    let map = null;
+    let geocoder = null;
+    let placeSearch = null;
+    let drivingDisplay = null;
+    let markers = [];
 
-  <!-- ══ PAGE: COMMUNITY ══ -->
-  <div class="page" id="page-comm">
-    <div class="comm-hero">
-      <div class="comm-title">⚔️ 城市对战社区</div>
-      <div class="comm-subtitle">基于城市身份的球迷社交 · 城市梗互动</div>
-    </div>
+    function showInfo(msg) {
+      const el = document.getElementById('infoBox');
+      el.style.display = 'block';
+      el.textContent = msg;
+    }
 
-    <!-- War banner -->
-    <div class="war-banner fade-up" onclick="showToast('⚔️ 楚汉争霸 · 徐州vs宿迁 · 3月13日开战!')">
-      <div class="war-emoji">⚔️</div>
-      <div class="war-text">
-        <h4>楚汉争霸 · 世纪决战</h4>
-        <p>徐州 🆚 宿迁 — 3月13日 · 7000+球迷已报名</p>
-      </div>
-      <div class="war-badge">🔥 HOT</div>
-    </div>
+    function hideInfo() {
+      const el = document.getElementById('infoBox');
+      el.style.display = 'none';
+      el.textContent = '';
+    }
 
-    <!-- Battle card -->
-    <div class="section-title">
-      <h3>上轮战报</h3>
-    </div>
-    <div class="battle-card fade-up" onclick="showToast('📊 查看完整战报')">
-      <div class="battle-header">
-        <div class="battle-title">⚔️ 第6轮 · 徐州 vs 宿迁</div>
-        <div class="battle-date">03/08</div>
-      </div>
-      <div class="battle-teams">
-        <div class="battle-team">
-          <div class="battle-team-icon">🦕</div>
-          <div class="battle-team-name">徐州FC</div>
-          <div class="battle-team-score">2</div>
-        </div>
-        <div class="battle-divider">:</div>
-        <div class="battle-team">
-          <div class="battle-team-icon">🌊</div>
-          <div class="battle-team-name">宿迁FC</div>
-          <div class="battle-team-score">1</div>
-        </div>
-      </div>
-      <div class="battle-bar-wrap">
-        <div class="battle-bar-label">
-          <span>射门 8次</span>
-          <span>控球率</span>
-          <span>5次 射门</span>
-        </div>
-        <div class="battle-bar"></div>
-      </div>
-    </div>
+    function showError(msg) {
+      const el = document.getElementById('errorBox');
+      el.style.display = 'block';
+      el.textContent = msg;
+    }
 
-    <!-- Share card -->
-    <div class="share-section">
-      <div class="share-card fade-up">
-        <div class="share-match">🦕 徐州 2 - 1 宿迁 🌊</div>
-        <div class="share-score">楚胜汉！</div>
-        <div class="share-desc">第6轮 · 徐州奥体 · 观众：23,800人<br>「彭城铁军，当仁不让！」</div>
-        <div class="share-footer">
-          <div class="share-brand">城超通</div>
-          <button class="share-btn" onclick="showToast('📤 战报卡片已生成，分享中…')">📤 一键分享</button>
-        </div>
-      </div>
-    </div>
+    function hideError() {
+      const el = document.getElementById('errorBox');
+      el.style.display = 'none';
+      el.textContent = '';
+    }
 
-    <!-- Posts -->
-    <div class="section-title">
-      <h3>球迷广场</h3>
-      <span class="section-more" onclick="openCompose()" style="cursor:pointer;color:var(--jade);font-weight:700;">✏️ 发帖</span>
-    </div>
-    <div class="posts-list">
-      <div class="post-card fade-up">
-        <div class="post-header">
-          <div class="post-avatar nj">🏰</div>
-          <div class="post-user">
-            <h5>金陵球迷@南京</h5>
-            <p>🏰 南京FC 死忠粉 · 23分钟前</p>
-          </div>
-        </div>
-        <div class="post-content">昨天南京场地的盐水鸭真的绝了！赛前在夫子庙买了一只，赛后又买了一只。南京队输了，但我鸭赢了 🦆😭</div>
-        <div class="post-footer">
-          <div class="post-action" onclick="toggleLike(this)">❤️ <span>234</span></div>
-          <div class="post-action post-comment-btn" onclick="toggleComments(this)">💬 <span>3</span> 评论</div>
-          <div class="post-action" onclick="openSharePreview(this)">📤 分享</div>
-        </div>
-        <div class="comments-section">
-          <div class="comment-item">
-            <div class="comment-avatar">🌸</div>
-            <div class="comment-bubble">
-              <div class="comment-user">苏州球迷小钱</div>
-              <div class="comment-text">哈哈哈 鸭赢了！下次来苏州吃大闸蟹，保证你蟹也赢了！</div>
-              <div class="comment-time">18分钟前</div>
-            </div>
-          </div>
-          <div class="comment-item">
-            <div class="comment-avatar">🥕</div>
-            <div class="comment-bubble">
-              <div class="comment-user">常州萝卜侠</div>
-              <div class="comment-text">南京鸭 vs 常州萝卜干，下次来常州我请你！</div>
-              <div class="comment-time">10分钟前</div>
-            </div>
-          </div>
-          <div class="comment-item">
-            <div class="comment-avatar">🦩</div>
-            <div class="comment-bubble">
-              <div class="comment-user">盐城海边风</div>
-              <div class="comment-text">来盐城啊！海鲜比鸭子更香！🦞</div>
-              <div class="comment-time">5分钟前</div>
-            </div>
-          </div>
-          <div class="comment-input-row">
-            <input class="comment-input" placeholder="说点什么…" maxlength="100" oninput="updateSend(this)">
-            <button class="comment-send" onclick="submitComment(this)">➤</button>
-          </div>
-        </div>
-      </div>
+    function setDebug(msg) {
+      document.getElementById('debugBox').textContent = msg || '';
+    }
 
-      <div class="post-card fade-up">
-        <div class="post-header">
-          <div class="post-avatar xz">🦕</div>
-          <div class="post-user">
-            <h5>彭城猛士@徐州</h5>
-            <p>🦕 徐州FC 核心球迷 · 1小时前</p>
-          </div>
-        </div>
-        <div class="post-content">楚汉争霸！宿迁的朋友，上周的2-1你们还记得吗？下次见面再说👊 彭城的爷们不服就干！</div>
-        <div class="post-image">⚔️<div class="post-image-label">楚汉争霸 · 现场图</div></div>
-        <div class="post-footer">
-          <div class="post-action" onclick="toggleLike(this)">❤️ <span>891</span></div>
-          <div class="post-action post-comment-btn" onclick="toggleComments(this)">💬 <span>4</span> 评论</div>
-          <div class="post-action" onclick="openSharePreview(this)">📤 分享</div>
-        </div>
-        <div class="comments-section">
-          <div class="comment-item">
-            <div class="comment-avatar">🌊</div>
-            <div class="comment-bubble">
-              <div class="comment-user">宿迁霸王后裔</div>
-              <div class="comment-text">项羽当年也没输！这次我们必赢你们 💪</div>
-              <div class="comment-time">55分钟前</div>
-            </div>
-          </div>
-          <div class="comment-item">
-            <div class="comment-avatar">🦕</div>
-            <div class="comment-bubble">
-              <div class="comment-user">汉刘邦粉丝团</div>
-              <div class="comment-text">哈哈哈 历史上刘邦赢的！徐州天命所归！🏆</div>
-              <div class="comment-time">45分钟前</div>
-            </div>
-          </div>
-          <div class="comment-item">
-            <div class="comment-avatar">🏰</div>
-            <div class="comment-bubble">
-              <div class="comment-user">南京路过吃瓜</div>
-              <div class="comment-text">江苏内战最精彩！坐等看好戏🍿</div>
-              <div class="comment-time">30分钟前</div>
-            </div>
-          </div>
-          <div class="comment-item">
-            <div class="comment-avatar">🌸</div>
-            <div class="comment-bubble">
-              <div class="comment-user">苏州温柔一刀</div>
-              <div class="comment-text">你们打得越凶越好，苏州坐收渔翁之利😏</div>
-              <div class="comment-time">20分钟前</div>
-            </div>
-          </div>
-          <div class="comment-input-row">
-            <input class="comment-input" placeholder="加入楚汉之争…" maxlength="100" oninput="updateSend(this)">
-            <button class="comment-send" onclick="submitComment(this)">➤</button>
-          </div>
-        </div>
-      </div>
+    function setLoading(flag, text = '正在计算...') {
+      const btn = document.getElementById('recommendBtn');
+      btn.disabled = flag;
+      if (flag) showInfo(text);
+      else hideInfo();
+    }
 
-      <div class="post-card fade-up">
-        <div class="post-header">
-          <div class="post-avatar cz">🥕</div>
-          <div class="post-user">
-            <h5>龙城萝卜干@常州</h5>
-            <p>🥕 常州FC 球迷 · 3小时前</p>
-          </div>
-        </div>
-        <div class="post-content">赢球了！给全场球迷发萝卜干！常州球迷独特庆祝方式，外地球迷看傻了哈哈😄 这就是苏超的魅力！</div>
-        <div class="post-footer">
-          <div class="post-action" onclick="toggleLike(this)">❤️ <span>1200</span></div>
-          <div class="post-action post-comment-btn" onclick="toggleComments(this)">💬 <span>5</span> 评论</div>
-          <div class="post-action" onclick="openSharePreview(this)">📤 分享</div>
-        </div>
-        <div class="comments-section">
-          <div class="comment-item">
-            <div class="comment-avatar">🏰</div>
-            <div class="comment-bubble">
-              <div class="comment-user">南京老司机</div>
-              <div class="comment-text">我要去常州！萝卜干+赢球双重快乐！🥕</div>
-              <div class="comment-time">2小时前</div>
-            </div>
-          </div>
-          <div class="comment-item">
-            <div class="comment-avatar">🌸</div>
-            <div class="comment-bubble">
-              <div class="comment-user">苏州园林客</div>
-              <div class="comment-text">苏州赢球发大闸蟹！和你们比比谁的更香 🦀</div>
-              <div class="comment-time">1小时45分前</div>
-            </div>
-          </div>
-          <div class="comment-item">
-            <div class="comment-avatar">🦩</div>
-            <div class="comment-bubble">
-              <div class="comment-user">盐城渔夫</div>
-              <div class="comment-text">我们赢球发海鲜！苏超每个城市都是美食节😂</div>
-              <div class="comment-time">1小时前</div>
-            </div>
-          </div>
-          <div class="comment-item">
-            <div class="comment-avatar">🐒</div>
-            <div class="comment-bubble">
-              <div class="comment-user">连云港孙大圣</div>
-              <div class="comment-text">我们赢球发花果山桃子🍑 欢迎来连云港！</div>
-              <div class="comment-time">40分钟前</div>
-            </div>
-          </div>
-          <div class="comment-item">
-            <div class="comment-avatar">🦕</div>
-            <div class="comment-bubble">
-              <div class="comment-user">徐州把子肉</div>
-              <div class="comment-text">我们赢球发把子肉！比萝卜干有料多了哈哈</div>
-              <div class="comment-time">25分钟前</div>
-            </div>
-          </div>
-          <div class="comment-input-row">
-            <input class="comment-input" placeholder="你们城市赢球发什么？" maxlength="100" oninput="updateSend(this)">
-            <button class="comment-send" onclick="submitComment(this)">➤</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+    function toLngLat(point) {
+      if (point instanceof AMap.LngLat) return point;
+      if (Array.isArray(point) && point.length === 2) return new AMap.LngLat(point[0], point[1]);
+      throw new Error('坐标格式错误');
+    }
 
-  <!-- ══ PAGE: STATS ══ -->
-  <div class="page" id="page-stats">
-    <div class="stats-hero">
-      <div class="stats-title">球员数据看板</div>
-      <div class="stats-subtitle">苏超第7轮 · 实时更新</div>
-    </div>
+    function formatDuration(seconds) {
+      const h = Math.floor(seconds / 3600);
+      const m = Math.round((seconds % 3600) / 60);
+      if (h > 0) return `${h}小时${m}分钟`;
+      return `${m}分钟`;
+    }
 
-    <div class="section-title">
-      <h3>射手榜</h3>
-    </div>
-    <div class="player-list">
-      <div class="player-card nj fade-up" onclick="showToast('📊 查看完整数据')">
-        <div class="player-rank rank-1">1</div>
-        <div class="player-avatar" style="background:linear-gradient(135deg,#1a3a5c,#2a6496)">⚽</div>
-        <div class="player-info">
-          <div class="player-name">王建国</div>
-          <div class="player-team">🏰 南京FC · 前锋</div>
-          <div class="player-stats">
-            <span class="stat-pill goals">⚽ 8球</span>
-            <span class="stat-pill assists">🅰️ 3助攻</span>
-            <span class="stat-pill rating">⭐ 8.7</span>
-          </div>
-        </div>
-        <div class="player-score">8</div>
-      </div>
-      <div class="player-card xz fade-up" onclick="showToast('📊 查看完整数据')">
-        <div class="player-rank rank-2">2</div>
-        <div class="player-avatar" style="background:linear-gradient(135deg,#8b1a1a,#c0392b)">⚽</div>
-        <div class="player-info">
-          <div class="player-name">李彭城</div>
-          <div class="player-team">🦕 徐州FC · 前锋</div>
-          <div class="player-stats">
-            <span class="stat-pill goals">⚽ 6球</span>
-            <span class="stat-pill assists">🅰️ 5助攻</span>
-            <span class="stat-pill rating">⭐ 8.4</span>
-          </div>
-        </div>
-        <div class="player-score">6</div>
-      </div>
-      <div class="player-card sz fade-up" onclick="showToast('📊 查看完整数据')">
-        <div class="player-rank rank-3">3</div>
-        <div class="player-avatar" style="background:linear-gradient(135deg,#3d1a5c,#7b3fa0)">⚽</div>
-        <div class="player-info">
-          <div class="player-name">张苏城</div>
-          <div class="player-team">🌸 苏州FC · 中锋</div>
-          <div class="player-stats">
-            <span class="stat-pill goals">⚽ 5球</span>
-            <span class="stat-pill assists">🅰️ 4助攻</span>
-            <span class="stat-pill rating">⭐ 8.1</span>
-          </div>
-        </div>
-        <div class="player-score">5</div>
-      </div>
-      <div class="player-card cz fade-up" onclick="showToast('📊 查看完整数据')">
-        <div class="player-rank rank-other">4</div>
-        <div class="player-avatar" style="background:linear-gradient(135deg,#8b5a0a,#d4a017)">⚽</div>
-        <div class="player-info">
-          <div class="player-name">陈萝卜</div>
-          <div class="player-team">🥕 常州FC · 前锋</div>
-          <div class="player-stats">
-            <span class="stat-pill goals">⚽ 4球</span>
-            <span class="stat-pill assists">🅰️ 6助攻</span>
-            <span class="stat-pill rating">⭐ 8.0</span>
-          </div>
-        </div>
-        <div class="player-score">4</div>
-      </div>
-    </div>
+    function formatDistance(meters) {
+      if (meters >= 1000) return `${(meters / 1000).toFixed(1)}km`;
+      return `${meters}m`;
+    }
 
-    <!-- Team stats bars -->
-    <div class="section-title">
-      <h3>球队综合指数</h3>
-    </div>
-    <div class="stat-bars">
-      <div class="stat-bar-item">
-        <div class="stat-bar-head"><span>🏰 南京FC</span><span>进攻 9.1</span></div>
-        <div class="stat-bar-track"><div class="stat-bar-fill fill-jade" style="width:91%"></div></div>
-      </div>
-      <div class="stat-bar-item">
-        <div class="stat-bar-head"><span>🦕 徐州FC</span><span>防守 8.8</span></div>
-        <div class="stat-bar-track"><div class="stat-bar-fill fill-blue" style="width:88%"></div></div>
-      </div>
-      <div class="stat-bar-item">
-        <div class="stat-bar-head"><span>🌸 苏州FC</span><span>控球 8.5</span></div>
-        <div class="stat-bar-track"><div class="stat-bar-fill fill-gold" style="width:85%"></div></div>
-      </div>
-      <div class="stat-bar-item">
-        <div class="stat-bar-head"><span>🥕 常州FC</span><span>配合 8.2</span></div>
-        <div class="stat-bar-track"><div class="stat-bar-fill fill-jade" style="width:82%"></div></div>
-      </div>
-      <div class="stat-bar-item">
-        <div class="stat-bar-head"><span>🦩 盐城FC</span><span>体能 7.9</span></div>
-        <div class="stat-bar-track"><div class="stat-bar-fill fill-blue" style="width:79%"></div></div>
-      </div>
-    </div>
+    function loadAmap() {
+      return new Promise((resolve, reject) => {
+        if (!AMAP_KEY || AMAP_KEY === 'YOUR_AMAP_KEY') {
+          reject(new Error('你还没有填写高德 Key。'));
+          return;
+        }
 
-    <!-- Standings -->
-    <div class="section-title">
-      <h3>积分榜</h3>
-    </div>
-    <div class="standings-table">
-      <div class="standings-header">
-        <span>#</span><span>球队</span><span>赛</span><span>胜</span><span>平</span><span>积分</span>
-      </div>
-      <div class="standings-row" onclick="showToast('🏰 南京FC 详细数据')">
-        <span class="st-pos top">1</span>
-        <div class="st-team-wrap"><span class="st-emoji">🏰</span><span class="st-name">南京FC</span></div>
-        <span class="st-num">7</span><span class="st-num">5</span><span class="st-num">1</span>
-        <span class="st-pts">16</span>
-      </div>
-      <div class="standings-row" onclick="showToast('🦕 徐州FC 详细数据')">
-        <span class="st-pos top">2</span>
-        <div class="st-team-wrap"><span class="st-emoji">🦕</span><span class="st-name">徐州FC</span></div>
-        <span class="st-num">7</span><span class="st-num">4</span><span class="st-num">2</span>
-        <span class="st-pts">14</span>
-      </div>
-      <div class="standings-row" onclick="showToast('🌸 苏州FC 详细数据')">
-        <span class="st-pos">3</span>
-        <div class="st-team-wrap"><span class="st-emoji">🌸</span><span class="st-name">苏州FC</span></div>
-        <span class="st-num">7</span><span class="st-num">4</span><span class="st-num">1</span>
-        <span class="st-pts">13</span>
-      </div>
-      <div class="standings-row" onclick="showToast('🥕 常州FC 详细数据')">
-        <span class="st-pos">4</span>
-        <div class="st-team-wrap"><span class="st-emoji">🥕</span><span class="st-name">常州FC</span></div>
-        <span class="st-num">7</span><span class="st-num">3</span><span class="st-num">2</span>
-        <span class="st-pts">11</span>
-      </div>
-      <div class="standings-row" onclick="showToast('🦩 盐城FC 详细数据')">
-        <span class="st-pos">5</span>
-        <div class="st-team-wrap"><span class="st-emoji">🦩</span><span class="st-name">盐城FC</span></div>
-        <span class="st-num">7</span><span class="st-num">3</span><span class="st-num">1</span>
-        <span class="st-pts">10</span>
-      </div>
-      <div class="standings-row" onclick="showToast('🌊 宿迁FC 详细数据')">
-        <span class="st-pos">6</span>
-        <div class="st-team-wrap"><span class="st-emoji">🌊</span><span class="st-name">宿迁FC</span></div>
-        <span class="st-num">7</span><span class="st-num">2</span><span class="st-num">3</span>
-        <span class="st-pts">9</span>
-      </div>
-    </div>
-  </div>
+        if (AMAP_SECURITY_JS_CODE && AMAP_SECURITY_JS_CODE !== 'YOUR_SECURITY_JS_CODE') {
+          window._AMapSecurityConfig = {
+            securityJsCode: AMAP_SECURITY_JS_CODE
+          };
+        }
 
-  <!-- NAV -->
-  <nav class="nav-bar">
-    <div class="nav-item active" onclick="switchPage('home')">
-      <div class="nav-icon">🏠</div>
-      <div class="nav-label">首页</div>
-    </div>
-    <div class="nav-item" onclick="switchPage('tour')">
-      <div class="nav-icon">🗺️</div>
-      <div class="nav-label">文旅</div>
-    </div>
-    <div class="nav-item" onclick="switchPage('comm')">
-      <div class="nav-icon">⚔️</div>
-      <div class="nav-label">社区</div>
-    </div>
-    <div class="nav-item" onclick="switchPage('stats')">
-      <div class="nav-icon">📊</div>
-      <div class="nav-label">数据</div>
-    </div>
-  </nav>
+        const script = document.createElement('script');
+        script.src = `https://webapi.amap.com/maps?v=2.0&key=${AMAP_KEY}&plugin=AMap.Geocoder,AMap.Driving,AMap.PlaceSearch`;
+        script.async = true;
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error('高德地图脚本加载失败。请检查 key、securityJsCode 或网络。'));
+        document.head.appendChild(script);
+      });
+    }
 
-  <!-- FAB -->
-  <div class="fab" onclick="openTicketModal()" title="抢票">🎫</div>
+    function initMap() {
+      map = new AMap.Map('map', {
+        zoom: 7,
+        center: [119.8, 32.3],
+        viewMode: '3D'
+      });
 
-  <!-- TOAST -->
-  <div class="toast" id="toast"></div>
+      geocoder = new AMap.Geocoder();
 
-  <!-- COMPOSE MODAL -->
-  <div class="compose-overlay" id="composeModal" onclick="closeComposeOutside(event)">
-    <div class="compose-sheet">
-      <div class="compose-header">
-        <div class="compose-title">✏️ 发布球迷帖子</div>
-        <button class="compose-close" onclick="closeCompose()">✕</button>
-      </div>
-      <div style="font-size:12px;color:var(--text2);margin-bottom:8px;">选择你的城市身份</div>
-      <div class="compose-city-select">
-        <div class="compose-city-btn active" onclick="selectComposeCity(this)">🏰 南京</div>
-        <div class="compose-city-btn" onclick="selectComposeCity(this)">🌸 苏州</div>
-        <div class="compose-city-btn" onclick="selectComposeCity(this)">🦕 徐州</div>
-        <div class="compose-city-btn" onclick="selectComposeCity(this)">🌊 宿迁</div>
-        <div class="compose-city-btn" onclick="selectComposeCity(this)">🥕 常州</div>
-        <div class="compose-city-btn" onclick="selectComposeCity(this)">🦩 盐城</div>
-        <div class="compose-city-btn" onclick="selectComposeCity(this)">🚣 扬州</div>
-        <div class="compose-city-btn" onclick="selectComposeCity(this)">🌉 镇江</div>
-        <div class="compose-city-btn" onclick="selectComposeCity(this)">🌾 淮安</div>
-        <div class="compose-city-btn" onclick="selectComposeCity(this)">🐒 连云港</div>
-        <div class="compose-city-btn" onclick="selectComposeCity(this)">🌅 无锡</div>
-        <div class="compose-city-btn" onclick="selectComposeCity(this)">🌿 泰州</div>
-        <div class="compose-city-btn" onclick="selectComposeCity(this)">⛵ 南通</div>
-      </div>
-      <textarea class="compose-textarea" id="composeText" placeholder="分享你的球迷故事、赛事体验、城市美食…&#10;&#10;例：今天去苏州看球，大闸蟹 + 进球，双倍快乐！🦀⚽" maxlength="300" oninput="updateCharCount(this)"></textarea>
-      <div class="compose-toolbar">
-        <div class="compose-tools">
-          <button class="compose-tool-btn" onclick="insertEmoji('⚽')">⚽</button>
-          <button class="compose-tool-btn" onclick="insertEmoji('🔥')">🔥</button>
-          <button class="compose-tool-btn" onclick="insertEmoji('🏆')">🏆</button>
-          <button class="compose-tool-btn" onclick="insertEmoji('😭')">😭</button>
-          <button class="compose-tool-btn" onclick="insertEmoji('💪')">💪</button>
-        </div>
-        <div class="compose-charcount" id="charCount">0 / 300</div>
-      </div>
-      <button class="btn-post" id="postBtn" onclick="publishPost()" disabled>发布帖子</button>
-    </div>
-  </div>
+      placeSearch = new AMap.PlaceSearch({
+        pageSize: 10,
+        pageIndex: 1
+      });
 
-  <!-- TICKET MODAL -->
-  <div class="modal-overlay" id="ticketModal" onclick="closeModalOutside(event)">
-    <div class="modal-sheet">
-      <div class="modal-handle"></div>
-      <div class="modal-title">🎫 南京 vs 苏州 · 3/15</div>
-      <div class="price-grid">
-        <div class="price-item selected" onclick="selectPrice(this)">
-          <div class="price-zone">普通看台</div>
-          <div class="price-value">¥80</div>
-          <div class="price-note">剩余 320张</div>
-        </div>
-        <div class="price-item" onclick="selectPrice(this)">
-          <div class="price-zone">主看台</div>
-          <div class="price-value">¥150</div>
-          <div class="price-note">剩余 86张</div>
-        </div>
-        <div class="price-item" onclick="selectPrice(this)">
-          <div class="price-zone">球迷区</div>
-          <div class="price-value">¥60</div>
-          <div class="price-note">限量 200张</div>
-        </div>
-        <div class="price-item" onclick="selectPrice(this)">
-          <div class="price-zone">VIP包厢</div>
-          <div class="price-value">¥680</div>
-          <div class="price-note">剩余 12席</div>
-        </div>
-      </div>
-      <button class="btn-confirm" onclick="confirmTicket()">确认购票 →</button>
-    </div>
-  </div>
+      drivingDisplay = new AMap.Driving({
+        map: map,
+        policy: AMap.DrivingPolicy.LEAST_TIME
+      });
+    }
 
-  <!-- SHARE PREVIEW MODAL -->
-  <div class="share-overlay" id="shareModal" onclick="closeShareOutside(event)">
-    <div style="display:flex;flex-direction:column;align-items:center;">
-      <div class="share-preview" id="sharePreviewCard">
-        <div class="share-preview-header">
-          <div class="share-preview-avatar" id="shareAvatar">🏰</div>
-          <div>
-            <div class="share-preview-user" id="shareUser">球迷</div>
-            <div class="share-preview-time" id="shareTime">刚刚</div>
-          </div>
-        </div>
-        <div class="share-preview-body" id="shareBody">内容</div>
-        <div class="share-preview-footer">
-          <div class="share-preview-brand">城超通</div>
-          <div class="share-preview-qr">扫码<br>下载</div>
-        </div>
-      </div>
-      <div class="share-actions">
-        <div class="share-action-btn" onclick="showToast('📱 已保存到相册'); closeShareModal();">
-          <div class="share-action-icon">💾</div>
-          <div class="share-action-label">保存图片</div>
-        </div>
-        <div class="share-action-btn" onclick="showToast('💬 已分享到微信'); closeShareModal();">
-          <div class="share-action-icon">💬</div>
-          <div class="share-action-label">微信好友</div>
-        </div>
-        <div class="share-action-btn" onclick="showToast('📢 已分享到朋友圈'); closeShareModal();">
-          <div class="share-action-icon">📢</div>
-          <div class="share-action-label">朋友圈</div>
-        </div>
-        <div class="share-action-btn" onclick="showToast('📋 链接已复制'); closeShareModal();">
-          <div class="share-action-icon">📋</div>
-          <div class="share-action-label">复制链接</div>
-        </div>
-      </div>
-      <button class="share-close-btn" onclick="closeShareModal()">关闭</button>
-    </div>
-  </div>
+    function clearMapOverlays() {
+      if (markers.length) {
+        map.remove(markers);
+        markers = [];
+      }
+      if (drivingDisplay) drivingDisplay.clear();
+    }
 
-  <!-- ROUTE DETAIL MODAL -->
-  <div class="route-overlay" id="routeModal" onclick="closeRouteOutside(event)">
-    <div class="route-detail-sheet" id="routeDetailSheet">
-      <div class="route-detail-header">
-        <button class="route-detail-close" onclick="closeRouteModal()">✕</button>
-        <div class="route-detail-city" id="routeDetailCity">南京</div>
-        <div class="route-detail-name" id="routeDetailName">金陵球迷一日游</div>
-        <div class="route-detail-date" id="routeDetailDate">📅 3月15日 · 比赛日</div>
-      </div>
-      <div class="route-timeline" id="routeTimeline">
-        <!-- filled by JS -->
-      </div>
-      <div class="route-detail-tags" id="routeDetailTags">
-        <!-- filled by JS -->
-      </div>
-      <div class="route-detail-actions">
-        <button class="btn-add-trip" onclick="showToast('✅ 已加入我的行程！'); closeRouteModal();">📌 加入行程</button>
-        <button class="btn-share-route" onclick="showToast('📤 路线已分享！'); closeRouteModal();">📤 分享路线</button>
-      </div>
-    </div>
-  </div>
-
-</div><!-- /app -->
-
-<script>
-  // Splash
-  setTimeout(() => {
-    document.getElementById('splash').classList.add('hide');
-  }, 2200);
-
-  // Page switch
-  function switchPage(name) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.getElementById('page-' + name).classList.add('active');
-    const idx = { home: 0, tour: 1, comm: 2, stats: 3 };
-    document.querySelectorAll('.nav-item')[idx[name]].classList.add('active');
-    window.scrollTo(0, 0);
-    if (name === 'stats') {
-      setTimeout(() => {
-        document.querySelectorAll('.stat-bar-fill').forEach(b => {
-          const w = b.style.width;
-          b.style.width = '0%';
-          setTimeout(() => { b.style.width = w; }, 100);
+    function geocodeAddress(address) {
+      return new Promise((resolve, reject) => {
+        geocoder.getLocation(address, (status, result) => {
+          if (
+            status === 'complete' &&
+            result &&
+            result.geocodes &&
+            result.geocodes.length > 0
+          ) {
+            const loc = result.geocodes[0].location;
+            resolve([loc.lng, loc.lat]);
+          } else {
+            reject(new Error(`地址解析失败：${address}`));
+          }
         });
-      }, 200);
+      });
     }
-  }
 
-  // Tour tab
-  function switchTourTab(el, tab) {
-    document.querySelectorAll('.tour-tab').forEach(t => t.classList.remove('active'));
-    el.classList.add('active');
-    document.getElementById('tour-routes').style.display = tab === 'routes' ? 'block' : 'none';
-    document.getElementById('tour-special').style.display = tab === 'special' ? 'block' : 'none';
-  }
-
-  // City filter
-  function filterCity(el) {
-    document.querySelectorAll('.city-chip').forEach(c => c.classList.remove('active'));
-    el.classList.add('active');
-    showToast('📍 ' + el.querySelector('.city-name').textContent + '赛程已筛选');
-  }
-
-  // Toast
-  let toastTimer;
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
-  }
-
-  // Ticket modal
-  function openTicketModal() {
-    document.getElementById('ticketModal').classList.add('show');
-  }
-  function closeModalOutside(e) {
-    if (e.target === document.getElementById('ticketModal'))
-      document.getElementById('ticketModal').classList.remove('show');
-  }
-  function selectPrice(el) {
-    document.querySelectorAll('.price-item').forEach(p => p.classList.remove('selected'));
-    el.classList.add('selected');
-  }
-  function confirmTicket() {
-    document.getElementById('ticketModal').classList.remove('show');
-    showToast('🎉 购票成功！已加入行程');
-  }
-
-  // ── LIKE ──
-  function toggleLike(btn) {
-    btn.classList.toggle('liked');
-    const span = btn.querySelector('span');
-    let n = parseInt(span.textContent.replace(/[^0-9]/g, '')) || 0;
-    if (btn.classList.contains('liked')) {
-      span.textContent = n + 1;
-      showToast('❤️ 已点赞');
-    } else {
-      span.textContent = Math.max(0, n - 1);
+    async function ensureVenueLngLat(match) {
+      if (Array.isArray(match.lnglat) && match.lnglat.length === 2) {
+        return match.lnglat;
+      }
+      const lnglat = await geocodeAddress(match.address);
+      match.lnglat = lnglat;
+      return lnglat;
     }
-  }
 
-  // ── COMMENTS TOGGLE ──
-  function toggleComments(btn) {
-    const card = btn.closest('.post-card');
-    const section = card.querySelector('.comments-section');
-    const isOpen = section.classList.toggle('open');
-    if (isOpen) {
-      section.querySelector('.comment-input').focus();
+    function calcDriving(origin, destination) {
+      return new Promise((resolve) => {
+        const drivingCalc = new AMap.Driving({
+          policy: AMap.DrivingPolicy.LEAST_TIME
+        });
+
+        drivingCalc.search(
+          toLngLat(origin),
+          toLngLat(destination),
+          (status, result) => {
+            if (
+              status === 'complete' &&
+              result &&
+              result.routes &&
+              result.routes.length > 0
+            ) {
+              const route = result.routes[0];
+              resolve({
+                ok: true,
+                distance: route.distance,
+                time: route.time,
+                raw: result
+              });
+            } else {
+              resolve({
+                ok: false,
+                status,
+                raw: result
+              });
+            }
+          }
+        );
+      });
     }
-  }
 
-  // Update send button state based on input
-  function updateSend(input) {
-    const btn = input.nextElementSibling;
-    btn.style.opacity = input.value.trim() ? '1' : '0.4';
-  }
+    function dedupePois(pois) {
+      const seen = new Set();
+      const result = [];
 
-  // Submit inline comment
-  function submitComment(sendBtn) {
-    const input = sendBtn.previousElementSibling;
-    const text = input.value.trim();
-    if (!text) return;
+      for (const poi of pois) {
+        const key = `${poi.name || ''}_${poi.address || ''}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          result.push(poi);
+        }
+      }
 
-    const section = sendBtn.closest('.comments-section');
-    const cityBtn = document.querySelector('.compose-city-btn.active');
-    const cityLabel = cityBtn ? cityBtn.textContent : '🏰 南京';
-
-    const newComment = document.createElement('div');
-    newComment.className = 'comment-item';
-    newComment.style.animation = 'fadeUp .3s ease forwards';
-    newComment.innerHTML = `
-      <div class="comment-avatar">${cityLabel.split(' ')[0]}</div>
-      <div class="comment-bubble">
-        <div class="comment-user">我 · ${cityLabel}</div>
-        <div class="comment-text">${text}</div>
-        <div class="comment-time">刚刚</div>
-      </div>`;
-    section.insertBefore(newComment, section.querySelector('.comment-input-row'));
-
-    // Update count
-    const card = section.closest('.post-card');
-    const countBtn = card.querySelector('.post-comment-btn span');
-    countBtn.textContent = parseInt(countBtn.textContent) + 1;
-
-    input.value = '';
-    sendBtn.style.opacity = '0.4';
-    showToast('💬 评论已发布！');
-  }
-
-  // Allow Enter key to submit comment
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' && e.target.classList.contains('comment-input')) {
-      e.preventDefault();
-      const sendBtn = e.target.nextElementSibling;
-      submitComment(sendBtn);
+      return result;
     }
-  });
 
-  // ── COMPOSE MODAL ──
-  function openCompose() {
-    document.getElementById('composeModal').classList.add('show');
-    setTimeout(() => document.getElementById('composeText').focus(), 400);
-  }
-  function closeCompose() {
-    document.getElementById('composeModal').classList.remove('show');
-  }
-  function closeComposeOutside(e) {
-    if (e.target === document.getElementById('composeModal')) closeCompose();
-  }
-
-  function selectComposeCity(el) {
-    document.querySelectorAll('.compose-city-btn').forEach(b => b.classList.remove('active'));
-    el.classList.add('active');
-  }
-
-  function updateCharCount(ta) {
-    const n = ta.value.length;
-    const el = document.getElementById('charCount');
-    el.textContent = n + ' / 300';
-    el.classList.toggle('warn', n > 250);
-    document.getElementById('postBtn').disabled = n === 0;
-  }
-
-  function insertEmoji(emoji) {
-    const ta = document.getElementById('composeText');
-    const pos = ta.selectionStart;
-    ta.value = ta.value.slice(0, pos) + emoji + ta.value.slice(pos);
-    ta.selectionStart = ta.selectionEnd = pos + emoji.length;
-    ta.focus();
-    updateCharCount(ta);
-  }
-
-  function publishPost() {
-    const text = document.getElementById('composeText').value.trim();
-    if (!text) return;
-    const cityBtn = document.querySelector('.compose-city-btn.active');
-    const cityLabel = cityBtn ? cityBtn.textContent : '🏰 南京';
-    const cityEmoji = cityLabel.split(' ')[0];
-    const cityName = cityLabel.split(' ')[1] || '南京';
-
-    // Inject new post at top of list
-    const list = document.querySelector('.posts-list');
-    const newCard = document.createElement('div');
-    newCard.className = 'post-card';
-    newCard.style.cssText = 'animation:fadeUp .4s ease forwards;border:1.5px solid var(--jade);';
-    newCard.innerHTML = `
-      <div class="post-header">
-        <div class="post-avatar" style="background:linear-gradient(135deg,var(--jade),var(--jade-light))">${cityEmoji}</div>
-        <div class="post-user">
-          <h5>我 · @${cityName} <span class="new-post-badge">NEW</span></h5>
-          <p>${cityLabel} · 刚刚</p>
-        </div>
-      </div>
-      <div class="post-content">${text}</div>
-      <div class="post-footer">
-        <div class="post-action" onclick="toggleLike(this)">❤️ <span>0</span></div>
-        <div class="post-action post-comment-btn" onclick="toggleComments(this)">💬 <span>0</span> 评论</div>
-        <div class="post-action" onclick="openSharePreview(this)">📤 分享</div>
-      </div>
-      <div class="comments-section">
-        <div class="comment-input-row">
-          <input class="comment-input" placeholder="说点什么…" maxlength="100" oninput="updateSend(this)">
-          <button class="comment-send" onclick="submitComment(this)">➤</button>
-        </div>
-      </div>`;
-    list.insertBefore(newCard, list.firstChild);
-
-    document.getElementById('composeText').value = '';
-    document.getElementById('charCount').textContent = '0 / 300';
-    document.getElementById('postBtn').disabled = true;
-    closeCompose();
-    showToast('🎉 帖子发布成功！');
-  }
-  // ── SHARE PREVIEW ──
-  function openSharePreview(btn) {
-    const card = btn.closest('.post-card');
-    const avatar = card.querySelector('.post-avatar');
-    const userName = card.querySelector('.post-user h5');
-    const userTime = card.querySelector('.post-user p');
-    const content = card.querySelector('.post-content');
-
-    document.getElementById('shareAvatar').textContent = avatar ? avatar.textContent : '⚽';
-    document.getElementById('shareUser').textContent = userName ? userName.textContent : '球迷';
-    document.getElementById('shareTime').textContent = userTime ? userTime.textContent : '';
-    document.getElementById('shareBody').textContent = content ? content.textContent : '';
-    document.getElementById('shareModal').classList.add('show');
-  }
-  function closeShareModal() {
-    document.getElementById('shareModal').classList.remove('show');
-  }
-  function closeShareOutside(e) {
-    if (e.target === document.getElementById('shareModal')) closeShareModal();
-  }
-
-  // ── ROUTE DETAIL ──
-  const routeData = {
-    nj: {
-      city: '🏰 南京 · 六朝古都', name: '金陵球迷一日游', date: '📅 3月15日 · 比赛日',
-      tags: [{t:'🦆 盐水鸭',c:'food'},{t:'🏛️ 中山陵',c:'scene'},{t:'🌙 夫子庙',c:'night'}],
-      timeline: [
-        {time:'09:00', icon:'🏛️', place:'中山陵', desc:'登高揽胜，缅怀先贤，感受金陵厚重历史'},
-        {time:'12:00', icon:'🍜', place:'秦淮夫子庙美食', desc:'牛肉锅贴、鸭血粉丝汤、糖芋苗…南京小吃一网打尽'},
-        {time:'15:30', icon:'⚽', place:'南京奥体中心观战', desc:'提前入场感受氛围，球迷区一起呐喊助威'},
-        {time:'19:30', icon:'🌙', place:'新街口夜市', desc:'赛后逛吃新街口，带上一只盐水鸭当伴手礼！'}
-      ]
-    },
-    sz: {
-      city: '🌸 苏州 · 园林水城', name: '苏城球迷精华游', date: '📅 3月22日 · 比赛日',
-      tags: [{t:'🦀 大闸蟹',c:'food'},{t:'🌿 拙政园',c:'scene'},{t:'🍜 苏帮菜',c:'night'}],
-      timeline: [
-        {time:'09:00', icon:'🌿', place:'拙政园漫步', desc:'世界文化遗产，移步换景，感受东方园林之美'},
-        {time:'12:00', icon:'🍜', place:'苏帮菜午宴', desc:'松鼠桂鱼、响油鳝糊…地道苏州味'},
-        {time:'15:30', icon:'⚽', place:'苏州体育中心看球', desc:'江南柔情碰撞足球激情，别有风味'},
-        {time:'19:30', icon:'🦀', place:'阳澄湖大闸蟹晚宴', desc:'赛后犒赏，正宗阳澄湖蟹配黄酒，人生赢家'}
-      ]
-    },
-    cz: {
-      city: '🥕 常州 · 龙城', name: '龙城萝卜干球迷行', date: '📅 3月16日 · 比赛日',
-      tags: [{t:'🥕 萝卜干',c:'food'},{t:'🦕 恐龙园',c:'scene'},{t:'🍺 老街夜市',c:'night'}],
-      timeline: [
-        {time:'09:00', icon:'🦕', place:'中华恐龙园', desc:'超刺激的过山车和恐龙主题体验，球迷也要会玩'},
-        {time:'12:00', icon:'🍜', place:'常州老街逛吃', desc:'大麻糕、银丝面、天目湖鱼头…常州味道'},
-        {time:'15:30', icon:'⚽', place:'常州体育中心决战', desc:'龙城主场，球迷热情如火，萝卜干加油法独一无二'},
-        {time:'19:00', icon:'🥕', place:'带走萝卜干', desc:'人手一罐正宗萝卜干，比赛纪念品就是它！'}
-      ]
-    },
-    yc: {
-      city: '🦩 盐城 · 鹤乡', name: '鹤乡海鲜球迷游', date: '📅 3月23日 · 比赛日',
-      tags: [{t:'🦞 盐城海鲜',c:'food'},{t:'🦌 麋鹿苑',c:'scene'},{t:'🔥 海鲜烧烤',c:'night'}],
-      timeline: [
-        {time:'09:00', icon:'🦌', place:'麋鹿自然保护区', desc:'国家级自然保护区，邂逅"四不像"麋鹿'},
-        {time:'12:00', icon:'🏛️', place:'新四军纪念馆', desc:'红色文化打卡，了解盐城革命历史'},
-        {time:'15:30', icon:'⚽', place:'盐城体育场助威', desc:'鹤乡球迷齐聚，海风中感受足球魅力'},
-        {time:'19:30', icon:'🦞', place:'海鲜烧烤趴', desc:'赛后海边烧烤大排档，龙虾螃蟹管够！'}
-      ]
-    },
-    xz: {
-      city: '🦕 徐州 · 楚汉故里', name: '彭城铁军球迷行', date: '📅 3月13日 · 比赛日',
-      tags: [{t:'🥩 把子肉',c:'food'},{t:'🏛️ 汉文化景区',c:'scene'},{t:'🌊 云龙湖夜游',c:'night'}],
-      timeline: [
-        {time:'09:00', icon:'🏛️', place:'汉文化景区', desc:'汉兵马俑、汉画像石…穿越两千年楚汉风云'},
-        {time:'12:00', icon:'🥩', place:'把子肉 + 烙馍', desc:'大块把子肉配烙馍卷菜，徐州爷们的力量午餐'},
-        {time:'15:30', icon:'⚽', place:'徐州奥体楚汉决战', desc:'彭城铁军主场，球迷氛围全省最燃'},
-        {time:'19:30', icon:'🌊', place:'云龙湖夜游骑行', desc:'赛后云龙湖畔骑行，吹风看夜景，完美收官'}
-      ]
-    },
-    sq: {
-      city: '🌊 宿迁 · 项羽故里', name: '西楚霸王球迷游', date: '📅 3月13日 · 比赛日',
-      tags: [{t:'🦀 洪泽湖螃蟹',c:'food'},{t:'⚔️ 项王故里',c:'scene'},{t:'🐟 骆马湖鱼宴',c:'night'}],
-      timeline: [
-        {time:'08:00', icon:'🐟', place:'骆马湖鲜鱼早饭', desc:'晨起品骆马湖银鱼羹，开启活力一天'},
-        {time:'10:00', icon:'⚔️', place:'项王故里祭拜', desc:'西楚霸王故里，感受千年英雄豪气'},
-        {time:'15:30', icon:'⚽', place:'宿迁体育场助威', desc:'虽败犹荣！宿迁球迷永不言弃'},
-        {time:'19:30', icon:'🦀', place:'洪泽湖螃蟹晚宴', desc:'赛后洪泽湖大闸蟹配美酒，化解胜负'}
-      ]
-    },
-    yz: {
-      city: '🚣 扬州 · 淮扬名城', name: '扬州早茶球迷慢游', date: '📅 3月20日 · 比赛日',
-      tags: [{t:'🍚 扬州炒饭',c:'food'},{t:'🌸 瘦西湖',c:'scene'},{t:'🍵 富春早茶',c:'night'}],
-      timeline: [
-        {time:'07:00', icon:'🍵', place:'富春茶社早茶', desc:'百年老店，翡翠烧麦、三丁包…扬州早起的理由'},
-        {time:'10:00', icon:'🌸', place:'瘦西湖泛舟', desc:'烟花三月下扬州，湖上泛舟赏景'},
-        {time:'15:30', icon:'⚽', place:'扬州体育馆观战', desc:'淮扬风雅融入球场热血'},
-        {time:'19:30', icon:'🍚', place:'淮扬菜宴席', desc:'扬州炒饭、狮子头、文思豆腐…一桌淮扬经典'}
-      ]
-    },
-    zj: {
-      city: '🌉 镇江 · 江南醋都', name: '醋都球迷探秘游', date: '📅 3月21日 · 比赛日',
-      tags: [{t:'🍶 恒顺香醋',c:'food'},{t:'⛩️ 金山寺',c:'scene'},{t:'🍜 锅盖面',c:'night'}],
-      timeline: [
-        {time:'09:00', icon:'⛩️', place:'金山寺祈福', desc:'白蛇传发源地，登金山俯瞰长江'},
-        {time:'11:00', icon:'🏔️', place:'北固山怀古', desc:'"何处望神州"，辛弃疾词中的北固亭'},
-        {time:'15:30', icon:'⚽', place:'镇江体育场助威', desc:'醋都球迷酸爽助威，别有味道'},
-        {time:'19:00', icon:'🍜', place:'锅盖面 + 香醋', desc:'镇江三怪之首锅盖面，带瓶恒顺香醋回家'}
-      ]
-    },
-    ha: {
-      city: '🌾 淮安 · 总理故里', name: '淮安运河球迷探访', date: '📅 3月27日 · 比赛日',
-      tags: [{t:'🐟 软兜长鱼',c:'food'},{t:'🏛️ 总理故居',c:'scene'},{t:'🚢 里运河夜游',c:'night'}],
-      timeline: [
-        {time:'09:00', icon:'🏛️', place:'周恩来故居参观', desc:'缅怀总理，了解伟人少年时光'},
-        {time:'11:00', icon:'🚢', place:'里运河文化长廊', desc:'漫步运河畔，感受淮安千年漕运文化'},
-        {time:'15:30', icon:'⚽', place:'淮安体育馆观战', desc:'淮安球迷热情似火，主场氛围浓厚'},
-        {time:'19:30', icon:'🐟', place:'软兜长鱼 + 钦工肉圆', desc:'淮扬菜发源地，正宗鲜味一绝'}
-      ]
-    },
-    lyg: {
-      city: '🐒 连云港 · 西游圣地', name: '花果山球迷奇遇记', date: '📅 3月28日 · 比赛日',
-      tags: [{t:'🦑 花果山海鲜',c:'food'},{t:'🐒 花果山',c:'scene'},{t:'🌊 渔人码头',c:'night'}],
-      timeline: [
-        {time:'08:30', icon:'🐒', place:'花果山登顶打卡', desc:'齐天大圣老家，登顶一览连云港全景'},
-        {time:'12:00', icon:'🦑', place:'渔人码头海鲜', desc:'新鲜打捞的海鲜，码头现做现吃'},
-        {time:'15:30', icon:'⚽', place:'连云港体育中心观战', desc:'海风中看球，连云港球迷豪爽热情'},
-        {time:'19:30', icon:'🌊', place:'海鲜大排档', desc:'赛后海边大排档，啤酒海鲜聊球赛'}
-      ]
-    },
-    wx: {
-      city: '🌅 无锡 · 太湖明珠', name: '太湖边球迷休闲游', date: '📅 3月29日 · 比赛日',
-      tags: [{t:'🐟 太湖三白',c:'food'},{t:'🌸 鼋头渚',c:'scene'},{t:'🎭 惠山古镇',c:'night'}],
-      timeline: [
-        {time:'09:00', icon:'🌸', place:'鼋头渚赏樱', desc:'太湖佳绝处，毕竟在鼋头，春日樱花如云'},
-        {time:'12:00', icon:'🎭', place:'惠山古镇泥人街', desc:'淘一个无锡大阿福，逛古镇品小吃'},
-        {time:'15:30', icon:'⚽', place:'无锡体育馆助威', desc:'太湖明珠的足球热情不输任何城市'},
-        {time:'19:30', icon:'🐟', place:'太湖三白晚宴', desc:'白鱼、白虾、银鱼，太湖鲜味巅峰'}
-      ]
-    },
-    tz: {
-      city: '🌿 泰州 · 水城慢游', name: '泰州慢城球迷游', date: '📅 4月5日 · 比赛日',
-      tags: [{t:'🥟 蟹黄汤包',c:'food'},{t:'🌿 溱湖湿地',c:'scene'},{t:'🍵 泰州早茶',c:'night'}],
-      timeline: [
-        {time:'08:00', icon:'🍵', place:'泰州早茶', desc:'干丝配烫干丝，泰州人的清晨仪式感'},
-        {time:'10:00', icon:'🌿', place:'溱湖湿地公园', desc:'国家级湿地公园，水乡泽国生态美'},
-        {time:'15:30', icon:'⚽', place:'泰州体育中心看球', desc:'慢城不慢热，泰州球迷的周末派对'},
-        {time:'19:00', icon:'🥟', place:'蟹黄汤包', desc:'皮薄馅大汁水鲜，一口爆浆的幸福'}
-      ]
-    },
-    nt: {
-      city: '⛵ 南通 · 江海之城', name: '江海南通球迷探访', date: '📅 4月6日 · 比赛日',
-      tags: [{t:'🦀 文蛤海鲜',c:'food'},{t:'⛰️ 狼山',c:'scene'},{t:'🏛️ 博物苑',c:'night'}],
-      timeline: [
-        {time:'09:00', icon:'⛰️', place:'狼山风景区登高', desc:'江海交汇处，登狼山望长江入海'},
-        {time:'11:00', icon:'🏛️', place:'南通博物苑', desc:'中国第一座公共博物馆，张謇先生创办'},
-        {time:'15:30', icon:'⚽', place:'南通体育中心观战', desc:'江海儿女的足球梦，南通球迷助威声浪高'},
-        {time:'19:30', icon:'🦀', place:'海鲜蒸蟹 + 文蛤', desc:'南通文蛤天下第一鲜，赛后必吃'}
-      ]
+    function searchNearbyByKeyword(keyword, center, radius) {
+      return new Promise((resolve) => {
+        placeSearch.searchNearBy(keyword, center, radius, (status, result) => {
+          if (
+            status === 'complete' &&
+            result &&
+            result.poiList &&
+            result.poiList.pois
+          ) {
+            resolve(result.poiList.pois);
+          } else {
+            resolve([]);
+          }
+        });
+      });
     }
-  };
 
-  function openRouteDetail(key) {
-    const data = routeData[key];
-    if (!data) return;
-    document.getElementById('routeDetailCity').textContent = data.city;
-    document.getElementById('routeDetailName').textContent = data.name;
-    document.getElementById('routeDetailDate').textContent = data.date;
+    async function searchNearbyRestaurants(center) {
+      const all = [];
 
-    // Build timeline
-    let html = '<div class="route-timeline-title">行程安排</div>';
-    data.timeline.forEach(item => {
-      html += `<div class="timeline-item">
-        <div class="timeline-dot">${item.icon}</div>
-        <div class="timeline-content">
-          <div class="timeline-time">${item.time}</div>
-          <div class="timeline-place">${item.place}</div>
-          <div class="timeline-desc">${item.desc}</div>
-        </div>
-      </div>`;
-    });
-    document.getElementById('routeTimeline').innerHTML = html;
+      all.push(...await searchNearbyByKeyword('餐饮服务', center, 2000));
 
-    // Build tags
-    let tagsHtml = '';
-    data.tags.forEach(tag => {
-      tagsHtml += `<span class="route-tag ${tag.c}">${tag.t}</span>`;
-    });
-    document.getElementById('routeDetailTags').innerHTML = tagsHtml;
+      if (all.length < 3) {
+        all.push(...await searchNearbyByKeyword('餐饮服务', center, 5000));
+      }
 
-    document.getElementById('routeModal').classList.add('show');
-  }
-  function closeRouteModal() {
-    document.getElementById('routeModal').classList.remove('show');
-  }
-  function closeRouteOutside(e) {
-    if (e.target === document.getElementById('routeModal')) closeRouteModal();
-  }
+      if (all.length < 3) {
+        all.push(...await searchNearbyByKeyword('美食', center, 5000));
+      }
 
-</script>
+      if (all.length < 3) {
+        all.push(...await searchNearbyByKeyword('中餐厅', center, 8000));
+      }
+
+      return dedupePois(all).slice(0, 3);
+    }
+
+    async function searchNearbySpots(center) {
+      const all = [];
+
+      all.push(...await searchNearbyByKeyword('风景名胜', center, 3000));
+
+      if (all.length < 3) {
+        all.push(...await searchNearbyByKeyword('风景名胜', center, 8000));
+      }
+
+      if (all.length < 3) {
+        all.push(...await searchNearbyByKeyword('旅游景点', center, 8000));
+      }
+
+      if (all.length < 3) {
+        all.push(...await searchNearbyByKeyword('公园', center, 8000));
+      }
+
+      if (all.length < 3) {
+        all.push(...await searchNearbyByKeyword('广场', center, 8000));
+      }
+
+      return dedupePois(all).slice(0, 3);
+    }
+
+    function createPoiMarker(lng, lat, text, bgColor, title) {
+      return new AMap.Marker({
+        position: [lng, lat],
+        title,
+        content: `
+          <div style="
+            width: 24px;
+            height: 24px;
+            border-radius: 999px;
+            background: ${bgColor};
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 6px rgba(0,0,0,.25);
+          ">${text}</div>
+        `,
+        offset: new AMap.Pixel(-12, -12)
+      });
+    }
+
+    async function scoreMatch(match, team, originLngLat) {
+      const venueLngLat = await ensureVenueLngLat(match);
+      const route = await calcDriving(originLngLat, venueLngLat);
+
+      if (!route.ok) {
+        return {
+          match,
+          ok: false,
+          totalScore: -1,
+          driveInfo: null,
+          reason: `路线失败: ${match.home} vs ${match.away}`
+        };
+      }
+
+      const teamScore = (match.home === team || match.away === team) ? 100 : 30;
+
+      const timeHours = route.time / 3600;
+      let distanceScore = 0;
+
+      if (timeHours <= 1) distanceScore = 100;
+      else if (timeHours <= 2) distanceScore = 80;
+      else if (timeHours <= 3) distanceScore = 60;
+      else distanceScore = 30;
+
+      const totalScore = Math.round(
+        teamScore * 0.6 +
+        distanceScore * 0.25 +
+        match.heat * 0.15
+      );
+
+      return {
+        match,
+        ok: true,
+        totalScore,
+        driveInfo: route
+      };
+    }
+
+    function renderResult(best, restaurants, spots, selectedTeam) {
+      document.getElementById('resultEmpty').style.display = 'none';
+      document.getElementById('resultContent').style.display = 'block';
+
+      const { match, totalScore, driveInfo } = best;
+
+      document.getElementById('matchTitle').textContent = `${match.home} vs ${match.away}`;
+      document.getElementById('matchDate').textContent = match.date;
+      document.getElementById('venueName').textContent = match.venue;
+      document.getElementById('venueAddress').textContent = match.address;
+      document.getElementById('travelTime').textContent = formatDuration(driveInfo.time);
+      document.getElementById('travelDistance').textContent = formatDistance(driveInfo.distance);
+      document.getElementById('matchScore').textContent = `${totalScore}分`;
+
+      const reasons = [];
+      if (match.home === selectedTeam || match.away === selectedTeam) {
+        reasons.push('已按你支持球队优先逻辑筛选');
+      } else {
+        reasons.push('当前没有你支持球队的可用比赛，退回到全局推荐');
+      }
+      reasons.push(`预计驾车约 ${formatDuration(driveInfo.time)}`);
+      reasons.push(`比赛热度 ${match.heat} 分`);
+
+      document.getElementById('reason').innerHTML = reasons.join('；');
+
+      const restaurantList = document.getElementById('restaurantList');
+      restaurantList.innerHTML = '';
+      if (!restaurants.length) {
+        restaurantList.innerHTML = '<li>附近暂未搜到餐饮。</li>';
+      } else {
+        restaurants.forEach((poi) => {
+          const li = document.createElement('li');
+          const dist = poi.distance ? `（约 ${poi.distance} 米）` : '';
+          const addr = poi.address || '地址未返回';
+          li.innerHTML = `<b>${poi.name}</b>${dist}<br><span class="muted">${addr}</span>`;
+          restaurantList.appendChild(li);
+        });
+      }
+
+      const spotList = document.getElementById('spotList');
+      spotList.innerHTML = '';
+      if (!spots.length) {
+        spotList.innerHTML = '<li>附近暂未搜到景点。</li>';
+      } else {
+        spots.forEach((poi) => {
+          const li = document.createElement('li');
+          const dist = poi.distance ? `（约 ${poi.distance} 米）` : '';
+          const addr = poi.address || '地址未返回';
+          li.innerHTML = `<b>${poi.name}</b>${dist}<br><span class="muted">${addr}</span>`;
+          spotList.appendChild(li);
+        });
+      }
+    }
+
+    function renderMap(best, originLngLat, restaurants, spots) {
+      clearMapOverlays();
+
+      const originMarker = new AMap.Marker({
+        position: toLngLat(originLngLat),
+        title: '出发地'
+      });
+
+      const venueMarker = new AMap.Marker({
+        position: toLngLat(best.match.lnglat),
+        title: best.match.venue
+      });
+
+      markers.push(originMarker, venueMarker);
+
+      restaurants.forEach((poi) => {
+        if (poi.location) {
+          const marker = createPoiMarker(
+            poi.location.lng,
+            poi.location.lat,
+            '餐',
+            '#2563eb',
+            poi.name
+          );
+          markers.push(marker);
+        }
+      });
+
+      spots.forEach((poi) => {
+        if (poi.location) {
+          const marker = createPoiMarker(
+            poi.location.lng,
+            poi.location.lat,
+            '景',
+            '#16a34a',
+            poi.name
+          );
+          markers.push(marker);
+        }
+      });
+
+      map.add(markers);
+      map.setFitView(markers);
+
+      drivingDisplay.clear();
+      drivingDisplay.search(
+        toLngLat(originLngLat),
+        toLngLat(best.match.lnglat)
+      );
+    }
+
+    async function recommend() {
+      hideError();
+      setDebug('');
+
+      const team = document.getElementById('team').value;
+      const originText = document.getElementById('origin').value.trim();
+
+      if (!originText) {
+        showError('请先输入你的出发地。');
+        return;
+      }
+
+      try {
+        setLoading(true, '正在计算推荐、路线、餐饮和景点...');
+
+        const originLngLat = await geocodeAddress(originText);
+
+        const results = [];
+        for (const match of matches) {
+          try {
+            const scored = await scoreMatch(match, team, originLngLat);
+            results.push(scored);
+          } catch (e) {
+            results.push({
+              match,
+              ok: false,
+              totalScore: -1,
+              driveInfo: null,
+              reason: e.message
+            });
+          }
+        }
+
+        const valid = results.filter(item => item.ok);
+
+        if (!valid.length) {
+          const failInfo = results.map(r => `${r.match.home} vs ${r.match.away}`).join(' | ');
+          setDebug(`全部比赛都没有算出路线。已尝试：${failInfo}`);
+          throw new Error('所有比赛的路线规划都失败了。请把出发地写得更具体一些，例如“南京南站”“苏州站”。');
+        }
+
+        const favoriteAll = results.filter(item =>
+          item.match.home === team || item.match.away === team
+        );
+
+        const favoriteValid = favoriteAll.filter(item => item.ok);
+
+        let best = null;
+
+        if (favoriteAll.length === 0) {
+          valid.sort((a, b) => b.totalScore - a.totalScore);
+          best = valid[0];
+        } else if (favoriteValid.length > 0) {
+          favoriteValid.sort((a, b) => b.totalScore - a.totalScore);
+          best = favoriteValid[0];
+        } else {
+          const titles = favoriteAll.map(item => `${item.match.home} vs ${item.match.away}`).join(' | ');
+          setDebug(`已找到 ${team} 的比赛，但路线规划失败：${titles}`);
+          throw new Error(`已找到 ${team} 的比赛，但该场路线规划失败。请检查该比赛地址，或把出发地写得更具体一些。`);
+        }
+
+        const [restaurants, spots] = await Promise.all([
+          searchNearbyRestaurants(best.match.lnglat),
+          searchNearbySpots(best.match.lnglat)
+        ]);
+
+        renderResult(best, restaurants, spots, team);
+        renderMap(best, originLngLat, restaurants, spots);
+
+        setDebug(
+          `推荐成功：${best.match.home} vs ${best.match.away}；` +
+          `路线 ${formatDuration(best.driveInfo.time)}，${formatDistance(best.driveInfo.distance)}；` +
+          `球场坐标 ${best.match.lnglat ? best.match.lnglat.join(', ') : '未返回'}`
+        );
+      } catch (err) {
+        console.error(err);
+        showError(err.message || '发生未知错误。');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    async function boot() {
+      try {
+        setLoading(true, '正在加载高德地图...');
+        await loadAmap();
+        initMap();
+
+        document.getElementById('recommendBtn').addEventListener('click', recommend);
+
+        setLoading(false);
+        showInfo('地图已加载完成，可以开始推荐。');
+        setTimeout(hideInfo, 1800);
+      } catch (err) {
+        console.error(err);
+        setLoading(false);
+        showError(err.message || '初始化失败。');
+      }
+    }
+
+    boot();
+  </script>
 </body>
 </html>
